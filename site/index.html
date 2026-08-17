@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cupel — assay your agent's extensions</title>
+<meta name="description" content="One command assays every skill, plugin, and MCP server your coding agent loads. Safety, token cost, quality — one verdict each.">
+<meta property="og:title" content="cupel">
+<meta property="og:description" content="You have no idea what your agent's extensions can reach.">
+<style>
+:root{
+  --ash:#0a0908;
+  --char:#12100e;
+  --slag:#1e1a16;
+  --rim:#2a241e;
+  --molten:#ff6a18;
+  --ember:#ffa62b;
+  --bead:#f6efe4;
+  --silver:#9c9287;
+  --dim:#6b6259;
+  --bad:#e5484d;
+
+  --display:"Didot","Bodoni 72","Bodoni MT",Baskerville,"Playfair Display",Georgia,serif;
+  --body:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:"SF Mono",Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+
+  --gut:clamp(1.25rem,5vw,6rem);
+  --maxw:1180px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--ash);
+  color:var(--silver);
+  font-family:var(--body);
+  font-size:clamp(1rem,.95rem + .25vw,1.125rem);
+  line-height:1.65;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- grain + furnace atmosphere ---------- */
+body::before{
+  content:"";position:fixed;inset:0;z-index:100;pointer-events:none;opacity:.42;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+
+.glow{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.glow::before{
+  content:"";position:absolute;left:50%;top:-28vh;width:120vw;height:90vh;transform:translateX(-50%);
+  background:radial-gradient(50% 50% at 50% 50%,rgba(255,106,24,.20),rgba(255,106,24,.06) 45%,transparent 72%);
+  animation:breathe 9s ease-in-out infinite;
+}
+.glow::after{
+  content:"";position:absolute;left:-20vw;bottom:-40vh;width:90vw;height:80vh;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(255,166,43,.10),transparent 70%);
+}
+@keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
+
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gut)}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .rv{animation:none;opacity:1;transform:none}
+  .glow::before{animation:none}
+  .bar-fill{animation:none !important;width:var(--pct) !important}
+  .cursor{animation:none}
+}
+
+/* ---------- type ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--molten);
+}
+h1{
+  font-family:var(--display);font-weight:400;color:var(--bead);
+  font-size:clamp(2.6rem,1.2rem + 6.2vw,6.4rem);
+  line-height:.98;letter-spacing:-.02em;margin:.32em 0 0;
+  text-wrap:balance;
+}
+h1 em{font-style:italic;color:var(--ember)}
+h2{
+  font-family:var(--display);font-weight:400;color:var(--bead);
+  font-size:clamp(1.9rem,1.1rem + 3vw,3.4rem);line-height:1.05;letter-spacing:-.015em;
+  text-wrap:balance;
+}
+h3{font-family:var(--mono);font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ember);font-weight:500}
+.lede{font-size:clamp(1.05rem,1rem + .5vw,1.4rem);color:var(--silver);max-width:44ch;margin-top:1.5rem}
+.section{padding-block:clamp(4.5rem,11vw,9rem);position:relative}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--rim) 12%,var(--rim) 88%,transparent)}
+
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:6rem 3rem}
+.mark{display:flex;align-items:baseline;gap:.85rem;margin-bottom:clamp(2.5rem,7vw,5rem)}
+.mark b{font-family:var(--display);font-size:1.6rem;font-weight:400;color:var(--bead);letter-spacing:.02em}
+.mark span{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+
+.cmd{
+  display:inline-flex;align-items:center;gap:1rem;margin-top:2.5rem;
+  border:1px solid var(--rim);background:rgba(255,106,24,.05);
+  padding:.85rem 1rem .85rem 1.25rem;
+}
+.cmd code{font-family:var(--mono);font-size:1rem;color:var(--bead)}
+.cmd code i{color:var(--molten);font-style:normal}
+.copy{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  background:none;border:1px solid var(--rim);color:var(--dim);padding:.5rem .7rem;cursor:pointer;
+  transition:color .2s,border-color .2s;
+}
+.copy:hover{color:var(--ember);border-color:var(--ember)}
+
+.status{
+  margin-top:2.25rem;display:inline-flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+}
+.dot{width:6px;height:6px;background:var(--ember);border-radius:50%;box-shadow:0 0 10px var(--ember)}
+
+/* ---------- window bar ---------- */
+.bar-block{margin-top:clamp(3.5rem,8vw,6rem);max-width:800px}
+.bar-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.bar{position:relative;height:44px;margin-top:.9rem;border:1px solid var(--rim);background:var(--char);overflow:hidden}
+.bar-fill{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,#c2410c,var(--molten) 60%,var(--ember));
+  animation:fill 2.1s cubic-bezier(.2,.7,.2,1) .55s forwards;
+}
+.bar-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16));}
+@keyframes fill{to{width:var(--pct)}}
+.ticks{position:absolute;inset:0;display:flex;pointer-events:none}
+.ticks i{flex:1;border-right:1px solid rgba(255,255,255,.05)}
+.ticks i:last-child{border:0}
+.bar-foot{display:flex;justify-content:space-between;margin-top:.7rem;font-family:var(--mono);font-size:.66rem;color:var(--dim)}
+.bar-note{margin-top:1.6rem;font-size:1.05rem;color:var(--silver);max-width:52ch}
+.bar-note b{color:var(--bead);font-weight:400}
+
+/* ---------- evidence ledger ---------- */
+.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--rim);margin-top:3.5rem;border:1px solid var(--rim)}
+.cell{background:var(--ash);padding:clamp(1.5rem,3vw,2.25rem)}
+.cell .n{font-family:var(--display);font-size:clamp(2.4rem,1.4rem + 3vw,3.8rem);line-height:1;color:var(--ember);letter-spacing:-.02em}
+.cell .n.warn{color:var(--molten)}
+.cell p{margin-top:.7rem;font-size:.95rem;line-height:1.5;color:var(--silver)}
+.cell cite{display:block;margin-top:.9rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-style:normal}
+
+.declined{
+  margin-top:3.5rem;border-left:2px solid var(--bad);padding:1.4rem 0 1.4rem 1.75rem;max-width:62ch;
+}
+.declined p{color:var(--silver)}
+.declined strong{color:var(--bead);font-weight:400}
+.declined .verdict{
+  display:inline-block;margin-top:1rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--bad);border:1px solid var(--bad);padding:.35rem .7rem;
+}
+
+/* ---------- pillars ---------- */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(2rem,4vw,3.5rem);margin-top:3.5rem}
+.pillar{position:relative;padding-top:2.5rem;border-top:1px solid var(--rim)}
+.stamp{
+  position:absolute;top:-1.05rem;right:0;width:2.1rem;height:2.1rem;border:1px solid var(--rim);
+  border-radius:50%;display:grid;place-items:center;background:var(--ash);
+  font-family:var(--mono);font-size:.7rem;color:var(--dim);
+}
+.pillar h4{font-family:var(--display);font-weight:400;font-size:1.7rem;color:var(--bead);margin-bottom:.6rem}
+.pillar p{font-size:.98rem}
+.pillar .why{
+  margin-top:1.1rem;font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--molten);
+  letter-spacing:.04em;
+}
+
+/* ---------- terminal ---------- */
+.term{
+  margin-top:3rem;border:1px solid var(--rim);background:#0d0b09;
+  font-family:var(--mono);font-size:clamp(.66rem,.55rem + .32vw,.82rem);line-height:1.85;
+  overflow-x:auto;
+}
+.term-bar{display:flex;gap:.45rem;padding:.75rem 1rem;border-bottom:1px solid var(--rim);align-items:center}
+.term-bar i{width:9px;height:9px;border-radius:50%;background:var(--rim)}
+.term-bar span{margin-left:.6rem;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.term pre{padding:1.4rem clamp(1rem,3vw,1.9rem) 1.9rem;color:var(--silver);white-space:pre;min-width:max-content}
+.term .p{color:var(--molten)}
+.term .g-d,.term .g-f{color:var(--bad)}
+.term .g-c{color:var(--ember)}
+.term .g-b{color:#8fbf7a}
+.term .hi{color:var(--bead)}
+.term .mut{color:var(--dim)}
+.cursor{display:inline-block;width:.55em;height:1.05em;background:var(--molten);vertical-align:-.16em;animation:blink 1.15s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- diff ---------- */
+.split{display:grid;grid-template-columns:1fr;gap:clamp(2rem,5vw,4rem);align-items:start}
+@media(min-width:900px){.split{grid-template-columns:.85fr 1.15fr}}
+.diff{border:1px solid var(--rim);background:#0d0b09;font-family:var(--mono);
+  font-size:clamp(.68rem,.58rem + .3vw,.82rem);line-height:1.95;overflow-x:auto}
+.diff pre{padding:1.5rem clamp(1rem,3vw,1.8rem);white-space:pre;min-width:max-content}
+.diff .add{color:#8fbf7a}
+.diff .rm{color:var(--bad)}
+.diff .hd{color:var(--bead)}
+.diff .mut{color:var(--dim)}
+
+/* ---------- principles ---------- */
+.prin{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2.5rem;margin-top:3rem}
+.prin div p{font-size:.96rem;margin-top:.55rem}
+.prin div strong{font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--bead);display:block}
+
+/* ---------- cta / footer ---------- */
+.cta{text-align:center;padding-block:clamp(5rem,12vw,10rem)}
+.cta h2{margin-inline:auto;max-width:16ch}
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2.5rem}
+.btn{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:1rem 1.9rem;border:1px solid var(--rim);color:var(--silver);text-decoration:none;
+  transition:all .22s;
+}
+.btn:hover{color:var(--ash);background:var(--ember);border-color:var(--ember)}
+.btn.solid{background:var(--molten);border-color:var(--molten);color:#140c05}
+.btn.solid:hover{background:var(--ember);border-color:var(--ember)}
+
+footer{border-top:1px solid var(--rim);padding-block:3rem;font-family:var(--mono);font-size:.68rem;color:var(--dim)}
+.frow{display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;align-items:center}
+footer a{color:var(--silver);text-decoration:none;border-bottom:1px solid var(--rim)}
+footer a:hover{color:var(--ember);border-color:var(--ember)}
+
+a.q{color:var(--ember);text-decoration:none;border-bottom:1px solid rgba(255,166,43,.3)}
+a.q:hover{border-color:var(--ember)}
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero wrap">
+  <div class="mark rv" style="animation-delay:.05s">
+    <b>cupel</b>
+    <span>fire assay for agent extensions</span>
+  </div>
+
+  <p class="eyebrow rv" style="animation-delay:.15s">Nobody has ever assayed what your agent loads</p>
+
+  <h1 class="rv" style="animation-delay:.25s">
+    You have no idea<br>what your extensions<br><em>can reach.</em>
+  </h1>
+
+  <p class="lede rv" style="animation-delay:.4s">
+    One command grades every skill, plugin, and MCP server your coding agent
+    loads — what it costs you, what it can touch, and whether it's any good.
+  </p>
+
+  <div class="cmd rv" style="animation-delay:.52s">
+    <code><i>$</i> npx cupel</code>
+    <button class="copy" id="copy" type="button">copy</button>
+  </div>
+
+  <p class="status rv" style="animation-delay:.62s">
+    <span class="dot"></span> Design complete · building in the open
+  </p>
+
+  <!-- the visceral moment -->
+  <div class="bar-block rv" style="animation-delay:.72s">
+    <div class="bar-head">
+      <span>Your context window</span>
+      <span>200,000 tokens</span>
+    </div>
+    <div class="bar">
+      <div class="bar-fill" style="--pct:31.7%"></div>
+      <div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="bar-foot">
+      <span>63,400 tokens consumed</span>
+      <span>31.7%</span>
+    </div>
+    <p class="bar-note">
+      That is a typical install of six MCP servers — <b>gone before you type a
+      word</b>, and paid again on every single turn.
+    </p>
+  </div>
+</header>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ══════════ EVIDENCE ══════════ -->
+<section class="section wrap">
+  <h3>§ 01 — The measurements</h3>
+  <h2 style="margin-top:1.2rem;max-width:20ch">Distribution arrived. Every quality gate was skipped.</h2>
+  <p class="lede">
+    In eighteen months, coding agents went from no extension model to eight
+    marketplaces. None of it came with verified publishers, provenance, an audit
+    command, or a lockfile.
+  </p>
+
+  <div class="ledger">
+    <div class="cell">
+      <div class="n warn">36%</div>
+      <p>of 3,984 scanned skills carry prompt-injection flaws. 76 had live payloads.</p>
+      <cite>Snyk ToxicSkills · Feb 2026</cite>
+    </div>
+    <div class="cell">
+      <div class="n warn">12%</div>
+      <p>of 2,857 ClawHub skills were outright malicious.</p>
+      <cite>Independent audit · 2026</cite>
+    </div>
+    <div class="cell">
+      <div class="n">1,184</div>
+      <p>skills poisoned in the ClawHavoc campaign — delivered <em>through updates</em>.</p>
+      <cite>OWASP · Apr 2026</cite>
+    </div>
+    <div class="cell">
+      <div class="n">6.2<span style="font-size:.4em;color:var(--dim)"> / 12</span></div>
+      <p>mean quality score across 47,150 public skills. Curated skills lift agent pass rates by 16.2 points.</p>
+      <cite>SkillsBench · 2026</cite>
+    </div>
+    <div class="cell">
+      <div class="n">42,000</div>
+      <p>tokens of tool schemas from a single MCP server — 21% of a 200K window.</p>
+      <cite>Measured · 2026</cite>
+    </div>
+    <div class="cell">
+      <div class="n warn">$2.3B</div>
+      <p>direct losses attributed to prompt injection in 2026. Up 340% year over year.</p>
+      <cite>Recorded Future · 2026</cite>
+    </div>
+  </div>
+
+  <div class="declined">
+    <p>
+      <strong>A verified marketplace was formally requested</strong> — publisher
+      identity, security review, code signing — in
+      <a class="q" href="https://github.com/anthropics/claude-code/issues/30727">anthropics/claude-code#30727</a>.
+    </p>
+    <span class="verdict">Closed as not planned</span>
+    <p style="margin-top:1.1rem">So nobody is coming. Run the assay yourself.</p>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ══════════ PILLARS ══════════ -->
+<section class="section wrap">
+  <h3>§ 02 — Three pillars, one verdict</h3>
+  <h2 style="margin-top:1.2rem;max-width:22ch">Your verdict is your worst pillar. Never the average.</h2>
+  <p class="lede">
+    A skill that is elegant, cheap, and insecure is not a B+. Averaging hides
+    exactly the failure this tool exists to surface.
+  </p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="stamp">S</div>
+      <h4>Safety</h4>
+      <p>
+        Injection patterns in tool descriptions, hidden Unicode and homoglyphs,
+        credential-path reach, network egress, shell surface, provenance.
+      </p>
+      <p class="why">→ because 36% of scanned skills are flawed</p>
+    </div>
+    <div class="pillar">
+      <div class="stamp">C</div>
+      <h4>Cost</h4>
+      <p>
+        Token weight of every tool schema and skill body, the tax they impose per
+        turn, your share of window consumed, projected spend.
+      </p>
+      <p class="why">→ because one server can eat 21% of your window</p>
+    </div>
+    <div class="pillar">
+      <div class="stamp">Q</div>
+      <h4>Quality</h4>
+      <p>
+        Structure, trigger clarity, length against usefulness, and semantic
+        overlap with the other skills you already have installed.
+      </p>
+      <p class="why">→ because curation is worth +16.2 points of pass rate</p>
+    </div>
+  </div>
+
+  <div class="term">
+    <div class="term-bar"><i></i><i></i><i></i><span>npx cupel</span></div>
+<pre><span class="mut">  Assaying 22 extensions ...</span>
+
+  <span class="hi">┌ SAFETY ──────────────────────────────────────────────────┐</span>
+  <span class="hi">│</span>  <span class="g-d">D</span>   notion-mcp        <span class="mut">reads ~/.config/gh, egress ×3</span>      <span class="hi">│</span>
+  <span class="hi">│</span>  <span class="g-c">C</span>   pdf-wizard        <span class="mut">hidden unicode in description</span>     <span class="hi">│</span>
+  <span class="hi">│</span>  <span class="g-b">B</span>   sql-runner        <span class="mut">shell exec surface</span>                <span class="hi">│</span>
+  <span class="hi">└──────────────────────────────────────────────────────────┘</span>
+
+  <span class="hi">┌ COST ────────────────────────────────────────────────────┐</span>
+  <span class="hi">│</span>  github-mcp        <span class="p">41,900 tok</span>    <span class="mut">21% of window</span>  $0.13/turn <span class="hi">│</span>
+  <span class="hi">│</span>  playwright-mcp    <span class="p">14,300 tok</span>     <span class="mut">7% of window</span>  $0.04/turn <span class="hi">│</span>
+  <span class="hi">└──────────────────────────────────────────────────────────┘</span>
+
+  <span class="hi">Token tax</span>    <span class="p">63,400 tokens per turn</span> <span class="mut">— 32% of your window</span>
+  <span class="hi">Verdict</span>      <span class="g-d">D</span>    <span class="mut">2 extensions need attention</span>
+
+  <span class="mut">cupel explain notion-mcp     cupel lock</span><span class="cursor"></span></pre>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ══════════ DIFF ══════════ -->
+<section class="section wrap">
+  <h3>§ 03 — The part nobody else does</h3>
+  <div class="split" style="margin-top:1.2rem">
+    <div>
+      <h2 style="max-width:14ch">Every scanner is blind to time.</h2>
+      <p class="lede">
+        A scanner tells you a thing looks fine <em>today</em>. ClawHavoc poisoned
+        1,184 skills <b style="color:var(--bead);font-weight:400">through updates</b> —
+        the attack that actually happened is a change over time.
+      </p>
+      <p style="margin-top:1.5rem;max-width:44ch">
+        <code style="font-family:var(--mono);color:var(--ember)">cupel diff</code>
+        keeps a lockfile and reports what changed. Rug-pull detection, running
+        locally, on your machine.
+      </p>
+    </div>
+    <div class="diff">
+<pre><span class="hd">CHANGED  github-mcp  2.2.0 -> 2.3.0</span>
+
+  <span class="add">+ reads  ~/.aws/credentials</span>          <span class="mut">(new)</span>
+  <span class="add">+ egress api.telemetry-collect.net</span>   <span class="mut">(new)</span>
+  <span class="rm">! safety  A- -> D</span>
+
+<span class="mut">  1 extension acquired new capabilities
+  since your last lock.</span></pre>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ══════════ PRINCIPLES ══════════ -->
+<section class="section wrap">
+  <h3>§ 04 — Non-negotiable</h3>
+  <div class="prin">
+    <div>
+      <strong>No network.</strong>
+      <p>Zero calls in the default path — enforced by test, not by promise. A tool that audits trust cannot itself be a data-collection channel.</p>
+    </div>
+    <div>
+      <strong>No account. No telemetry.</strong>
+      <p>Nothing leaves your machine. Ever. Credential values in your config files are never read, never stored, never rendered.</p>
+    </div>
+    <div>
+      <strong>Cross-platform.</strong>
+      <p>Existing runtime tools are Linux-kernel-only — Landlock, seccomp — or enterprise platforms. Cupel runs on your Mac.</p>
+    </div>
+    <div>
+      <strong>Rules are data.</strong>
+      <p>Detection rules are versioned YAML with their own test cases. Contribute one without reading a line of TypeScript.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ══════════ CTA ══════════ -->
+<section class="cta wrap">
+  <p class="eyebrow">A cupel is the vessel that reveals what a metal is actually made of</p>
+  <h2 style="margin-top:1.4rem">Heat it. See what survives.</h2>
+  <div class="btns">
+    <a class="btn solid" href="https://github.com/mihhhir08/cupel">Star on GitHub</a>
+    <a class="btn" href="https://github.com/mihhhir08/cupel/blob/main/docs/PRD.md">Read the PRD</a>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="frow">
+    <span>cupel — Apache-2.0 · <a href="https://github.com/mihhhir08/cupel">github.com/mihhhir08/cupel</a></span>
+    <span>Built by <a href="https://github.com/mihhhir08">Mihirsinh Chavda</a></span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('copy').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  try {
+    await navigator.clipboard.writeText('npx cupel');
+    btn.textContent = 'copied';
+  } catch {
+    btn.textContent = 'select it';
+  }
+  setTimeout(() => { btn.textContent = 'copy'; }, 1600);
+});
+</script>
+</body>
+</html>
