@@ -9,6 +9,8 @@ what it can reach, whether it works.
 npx cupel
 ```
 
+> This README ships with the npm package. cupel is not yet published, so `npx cupel` does not resolve today. Run it from source: https://github.com/mihhhir08/cupel
+
 ```
   Assayed 83 extensions
 
