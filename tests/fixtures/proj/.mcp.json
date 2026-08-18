@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "sql-runner": { "command": "uvx", "args": ["sql-mcp"] }
+  }
+}
