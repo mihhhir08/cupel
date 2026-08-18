@@ -11,15 +11,11 @@
   "scripts": {
     "build": "tsc --build",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "npm run build"
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
     "vitest": "^2.1.0",
     "@types/node": "^20.14.0"
-  },
-  "bin": {
-    "cupel": "packages/cli/dist/index.js"
   }
 }

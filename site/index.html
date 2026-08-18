@@ -199,7 +199,7 @@ footer{border-top:1px solid var(--line);padding-block:2.2rem;font-size:.82rem;co
     <p class="lede">cupel grades every skill and MCP server on your machine. What it
     costs, what it can reach, whether it works.</p>
     <div class="cta-row">
-      <div class="cmd"><code><b>$</b> npx cupel</code><button class="copy" type="button">Copy</button></div>
+      <div class="cmd"><code><b>$</b> git clone git@github.com:mihhhir08/cupel.git</code><button class="copy" type="button">Copy</button></div>
       <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
     </div>
   </div>
@@ -243,7 +243,7 @@ footer{border-top:1px solid var(--line);padding-block:2.2rem;font-size:.82rem;co
 
 <section class="wrap rev" style="padding-bottom:var(--sect)"><div class="tg">
   <div class="code">
-    <div class="code-bar">npx cupel</div>
+    <div class="code-bar">cupel</div>
 <pre>  <span class="hi">Assayed 83 extensions</span>
 
   <span class="gd">A</span>  math-olympiad          <span class="ac">180 tok</span>   0% of window  +4,757 on use
@@ -354,7 +354,7 @@ footer{border-top:1px solid var(--line);padding-block:2.2rem;font-size:.82rem;co
 <section class="close rev"><div class="wrap">
   <h2>Find out what you already installed.</h2>
   <div class="cta-row">
-    <div class="cmd"><code><b>$</b> npx cupel</code><button class="copy" type="button">Copy</button></div>
+    <div class="cmd"><code><b>$</b> git clone git@github.com:mihhhir08/cupel.git</code><button class="copy" type="button">Copy</button></div>
     <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
   </div>
 </div></section>
@@ -369,7 +369,7 @@ footer{border-top:1px solid var(--line);padding-block:2.2rem;font-size:.82rem;co
 
 <script>
 document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',async function(){
-  try{await navigator.clipboard.writeText('npx cupel');b.textContent='Copied';}catch{b.textContent='Select it';}
+  try{await navigator.clipboard.writeText('git clone https://github.com/mihhhir08/cupel && cd cupel && npm install && npm run build && node packages/cli/dist/index.js');b.textContent='Copied';}catch{b.textContent='Select it';}
   setTimeout(function(){b.textContent='Copy';},1600);});});
 if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){
