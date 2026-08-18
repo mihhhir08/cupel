@@ -1,0 +1,8 @@
+{
+  "name": "cupel",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": { "cupel": "./dist/index.js" },
+  "files": ["dist"],
+  "dependencies": { "@cupel/core": "0.0.1" }
+}
