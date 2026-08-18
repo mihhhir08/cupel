@@ -254,6 +254,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
   a[href^="http"]::after{content:" (" attr(href) ")";font-size:.75em;color:#555}
 }
 
+.hint{margin-top:1rem;font-size:.83rem;color:var(--ink-3);max-width:47ch;line-height:1.55}
+.hint code{font-family:var(--mono);font-size:.94em;color:var(--ink-2)}
 </style>
 </head>
 <body>
@@ -268,9 +270,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
     <p class="lede">cupel grades every skill and MCP server on your machine. What it
     costs, what it can reach, whether it works.</p>
     <div class="cta-row">
-      <div class="cmd"><code><b>$</b> git clone git@github.com:mihhhir08/cupel.git</code><button class="copy" type="button">Copy</button></div>
+      <div class="cmd"><code><b>$</b> git clone https://github.com/mihhhir08/cupel</code><button class="copy" type="button">Copy</button></div>
       <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
     </div>
+      <p class="hint">Then <code>npm install</code>, <code>npm run build</code>, and <code>node packages/cli/dist/index.js</code>. Copy takes the whole chain. Not on npm yet.</p>
   </div>
   <div class="readout">
     <div class="ro-head"><span class="eyebrow">Your context window</span><span class="num">200,000 tokens</span></div>
@@ -423,7 +426,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 <section class="close rev"><div class="wrap">
   <h2>Find out what you already installed.</h2>
   <div class="cta-row">
-    <div class="cmd"><code><b>$</b> git clone git@github.com:mihhhir08/cupel.git</code><button class="copy" type="button">Copy</button></div>
+    <div class="cmd"><code><b>$</b> git clone https://github.com/mihhhir08/cupel</code><button class="copy" type="button">Copy</button></div>
     <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
   </div>
 </div></section>
