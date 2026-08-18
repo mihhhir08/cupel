@@ -4,8 +4,6 @@
 > macOS, Linux, and Windows on Node 20 and 22. Three defects surfaced by
 > running against a real machine are recorded in "Deviations" at the end.
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
-
 **Goal:** Ship `npx cupel` — a working CLI that discovers every skill and MCP server on the machine and reports the token tax each one imposes per turn.
 
 **Architecture:** An npm-workspaces monorepo. `@cupel/core` is a pure function of the filesystem: it discovers extensions, extracts their content, runs the cost analyzer, and returns a typed `Assay` object. It performs no printing and no network access. `@cupel/cli` is presentation only — it calls `assay()` and renders. This boundary is the most important one in the system; every later phase adds an analyzer to `core` without touching `cli`.

@@ -29,7 +29,7 @@ than any trust infrastructure to support it. Eight marketplaces now distribute
 hundreds of thousands of skills and MCP servers with no verified publishers, no
 provenance, no audit command, and no lockfile.
 
-Measured consequences are in `docs/superpowers/specs/2026-08-17-cupel-design.md`
+Measured consequences are in `docs/DESIGN.md`
 §1. The headline figures: 36% of scanned skills carry prompt-injection flaws, the
 mean quality of 47,150 public skills is 6.2 out of 12, and a single MCP server can
 consume 21% of a 200,000-token context window before the user types a word.

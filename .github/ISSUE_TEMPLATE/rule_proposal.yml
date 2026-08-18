@@ -1,0 +1,33 @@
+name: Rule proposal
+description: Propose a detection rule
+labels: [rule]
+body:
+  - type: markdown
+    attributes:
+      value: Rules are YAML with test cases. See CONTRIBUTING.md for the format.
+  - type: dropdown
+    id: pillar
+    attributes:
+      label: Pillar
+      options: [safety, cost, quality]
+    validations: { required: true }
+  - type: textarea
+    id: detects
+    attributes:
+      label: What it detects
+      description: Describe the pattern and why it matters.
+    validations: { required: true }
+  - type: textarea
+    id: positive
+    attributes:
+      label: Should match
+      description: Input this rule must flag.
+    validations: { required: true }
+  - type: textarea
+    id: negative
+    attributes:
+      label: Should not match
+      description: >
+        Input this rule must NOT flag. Required. False positives are what teach
+        people to ignore an audit tool.
+    validations: { required: true }

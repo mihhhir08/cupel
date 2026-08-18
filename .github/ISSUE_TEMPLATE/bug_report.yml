@@ -1,0 +1,25 @@
+name: Bug report
+description: Something cupel got wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did cupel report, and what did you expect?
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproducing input
+      description: >
+        The skill or MCP config that triggered it. Remove any credential values
+        before pasting. cupel never reads them, but this issue is public.
+      render: json
+    validations: { required: true }
+  - type: input
+    id: env
+    attributes:
+      label: OS and Node version
+      placeholder: macOS 15.1, Node 22.3
+    validations: { required: true }

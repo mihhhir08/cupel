@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Date:** 2026-08-17
-**Companion documents:** `PRD.md` (what and why), `superpowers/specs/2026-08-17-cupel-design.md` (design rationale)
+**Companion documents:** `PRD.md` (what and why), `DESIGN.md` (design rationale)
 
 ---
 
