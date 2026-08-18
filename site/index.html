@@ -3,488 +3,483 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>cupel — assay your agent's extensions</title>
-<meta name="description" content="One command assays every skill, plugin, and MCP server your coding agent loads. Safety, token cost, quality — one verdict each.">
+<title>cupel</title>
+<meta name="description" content="cupel grades every skill and MCP server on your machine: what it costs, what it can reach, whether it works.">
 <meta property="og:title" content="cupel">
-<meta property="og:description" content="You have no idea what your agent's extensions can reach.">
+<meta property="og:description" content="You have never read what your agent loads.">
+<link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-:root{
-  --ash:#0a0908;
-  --char:#12100e;
-  --slag:#1e1a16;
-  --rim:#2a241e;
-  --molten:#ff6a18;
-  --ember:#ffa62b;
-  --bead:#f6efe4;
-  --silver:#9c9287;
-  --dim:#6b6259;
-  --bad:#e5484d;
-
-  --display:"Didot","Bodoni 72","Bodoni MT",Baskerville,"Playfair Display",Georgia,serif;
-  --body:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-  --mono:"SF Mono",Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-
-  --gut:clamp(1.25rem,5vw,6rem);
-  --maxw:1180px;
+/* Self-hosted Geist (SIL OFL). No external font requests. */
+@font-face {
+  font-family: 'Geist';
+  src: url('fonts/Geist-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900; font-display: swap; font-style: normal;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('fonts/GeistMono-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900; font-display: swap; font-style: normal;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{
-  background:var(--ash);
-  color:var(--silver);
-  font-family:var(--body);
-  font-size:clamp(1rem,.95rem + .25vw,1.125rem);
-  line-height:1.65;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
+/* ── Tokens. Light is the base; dark redefines tokens only. ────────────── */
+:root {
+  --bg:        #f2f2ef;
+  --surface:   #ffffff;
+  --surface-2: #ececea;
+  --ink:       #16171a;
+  --ink-2:     #55585f;
+  --ink-3:     #8a8d95;
+  --line:      #dedcd6;
+  --line-2:    #c9c7c0;
+  --accent:    #2c3fd4;
+  --accent-bg: rgba(44,63,212,.07);
+  --good:      #1f6f45;
+  --warn:      #8a5a12;
+  --crit:      #b02a1f;
+
+  --sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --pad: clamp(1.25rem, 4vw, 4.5rem);
+  --maxw: 1240px;
+  --sect: clamp(4rem, 9vw, 7.5rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #101114;
+    --surface:   #17181c;
+    --surface-2: #1d1f24;
+    --ink:       #eceded;
+    --ink-2:     #a4a8b0;
+    --ink-3:     #71757f;
+    --line:      #26282e;
+    --line-2:    #33363d;
+    --accent:    #8494ff;
+    --accent-bg: rgba(132,148,255,.10);
+    --good:      #4aa877;
+    --warn:      #c79541;
+    --crit:      #e0685c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#101114; --surface:#17181c; --surface-2:#1d1f24;
+  --ink:#eceded; --ink-2:#a4a8b0; --ink-3:#71757f;
+  --line:#26282e; --line-2:#33363d;
+  --accent:#8494ff; --accent-bg:rgba(132,148,255,.10);
+  --good:#4aa877; --warn:#c79541; --crit:#e0685c;
 }
 
-/* ---------- grain + furnace atmosphere ---------- */
-body::before{
-  content:"";position:fixed;inset:0;z-index:100;pointer-events:none;opacity:.42;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
-  mix-blend-mode:overlay;
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { -webkit-text-size-adjust:100% }
+body {
+  background:var(--bg); color:var(--ink-2);
+  font-family:var(--sans); font-size:1rem; line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+/* One radius system: sharp. Every panel, button and chip is square. */
+.panel,.btn,.chip,.cell,.code { border-radius:0 }
+
+.wrap { max-width:var(--maxw); margin-inline:auto; padding-inline:var(--pad) }
+h1,h2,h3 { color:var(--ink); font-weight:500; letter-spacing:-.025em; text-wrap:balance }
+h1 { font-size:clamp(2.3rem,1.5rem + 3.3vw,4.2rem); line-height:1.03 }
+h2 { font-size:clamp(1.65rem,1.2rem + 1.9vw,2.6rem); line-height:1.1 }
+h3 { font-size:1.0625rem; letter-spacing:-.01em }
+p  { max-width:65ch }
+a  { color:inherit }
+.num { font-family:var(--mono); font-variant-numeric:tabular-nums; font-feature-settings:"tnum" }
+.eyebrow {
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.ico { width:1.15rem; height:1.15rem; display:block }
+
+/* ── Motion. Reveal communicates sequence; gauge fill shows measurement. ─ */
+.rev { opacity:0; transform:translateY(14px); transition:opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1) }
+.rev.in { opacity:1; transform:none }
+@media (prefers-reduced-motion:reduce) {
+  .rev { opacity:1; transform:none; transition:none }
+  .fill { animation:none !important; width:var(--w) !important }
 }
 
-.glow{position:fixed;inset:0;z-index:-1;pointer-events:none}
-.glow::before{
-  content:"";position:absolute;left:50%;top:-28vh;width:120vw;height:90vh;transform:translateX(-50%);
-  background:radial-gradient(50% 50% at 50% 50%,rgba(255,106,24,.20),rgba(255,106,24,.06) 45%,transparent 72%);
-  animation:breathe 9s ease-in-out infinite;
-}
-.glow::after{
-  content:"";position:absolute;left:-20vw;bottom:-40vh;width:90vw;height:80vh;
-  background:radial-gradient(50% 50% at 50% 50%,rgba(255,166,43,.10),transparent 70%);
-}
-@keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
+/* ── Nav ────────────────────────────────────────────────────────────────── */
+nav { border-bottom:1px solid var(--line); background:var(--bg); position:sticky; top:0; z-index:20 }
+.nav-in { height:64px; display:flex; align-items:center; justify-content:space-between; gap:1.5rem }
+.brand { font-weight:600; color:var(--ink); letter-spacing:-.02em; font-size:1.0625rem; text-decoration:none }
+.nav-links { display:flex; align-items:center; gap:1.6rem; font-size:.875rem }
+.nav-links a { text-decoration:none; color:var(--ink-2); transition:color .18s }
+.nav-links a:hover { color:var(--ink) }
+.nav-links a:focus-visible,.btn:focus-visible,.copy:focus-visible { outline:2px solid var(--accent); outline-offset:3px }
 
-.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gut)}
-
-/* ---------- reveal ---------- */
-.rv{opacity:0;transform:translateY(18px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
-@keyframes rise{to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){
-  .rv{animation:none;opacity:1;transform:none}
-  .glow::before{animation:none}
-  .bar-fill{animation:none !important;width:var(--pct) !important}
-  .cursor{animation:none}
+/* ── Hero: asymmetric split, copy left, live measurement right ─────────── */
+.hero { padding-block:clamp(2.5rem,5vw,4.5rem) clamp(3rem,6vw,5rem) }
+.hero-grid { display:grid; gap:clamp(2.5rem,5vw,4rem); align-items:center }
+@media (min-width:940px) { .hero-grid { grid-template-columns:1.05fr .95fr } }
+.hero p.lede { margin-top:1.4rem; font-size:clamp(1.02rem,.98rem + .35vw,1.2rem); max-width:46ch }
+.cta-row { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; margin-top:2.2rem }
+.cmd {
+  display:inline-flex; align-items:stretch; border:1px solid var(--line-2); background:var(--surface);
 }
-
-/* ---------- type ---------- */
-.eyebrow{
-  font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;
-  color:var(--molten);
+.cmd code { font-family:var(--mono); font-size:.925rem; color:var(--ink); padding:.8rem 1rem; white-space:nowrap }
+.cmd code b { color:var(--ink-3); font-weight:400; user-select:none }
+.copy {
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+  border:0; border-left:1px solid var(--line); background:var(--surface-2); color:var(--ink-2);
+  padding-inline:.95rem; cursor:pointer; transition:background .18s,color .18s;
 }
-h1{
-  font-family:var(--display);font-weight:400;color:var(--bead);
-  font-size:clamp(2.6rem,1.2rem + 6.2vw,6.4rem);
-  line-height:.98;letter-spacing:-.02em;margin:.32em 0 0;
-  text-wrap:balance;
+.copy:hover { background:var(--accent); color:#fff }
+.ghost { font-size:.9rem; color:var(--ink-2); text-decoration:none; border-bottom:1px solid var(--line-2); padding-bottom:2px; transition:color .18s,border-color .18s }
+.ghost:hover { color:var(--accent); border-color:var(--accent) }
+
+/* gauge */
+.gauge { border:1px solid var(--line); background:var(--surface); padding:clamp(1.4rem,2.6vw,2rem) }
+.gauge-head { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; padding-bottom:1.1rem; border-bottom:1px solid var(--line) }
+.gauge-head span:last-child { font-family:var(--mono); font-size:.8rem; color:var(--ink) }
+.meter { margin-top:1.5rem }
+.meter + .meter { margin-top:1.6rem }
+.meter-top { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; font-size:.85rem; margin-bottom:.5rem }
+.meter-top b { font-weight:500; color:var(--ink) }
+.meter-top .num { color:var(--ink); font-size:.85rem }
+.track { height:12px; background:var(--surface-2); border:1px solid var(--line); position:relative; overflow:hidden }
+.fill { position:absolute; inset:0 auto 0 0; width:0; background:var(--accent); animation:grow 1.5s cubic-bezier(.16,1,.3,1) .35s forwards }
+.fill.lo { background:var(--ink-3); animation-delay:.15s }
+@keyframes grow { to { width:var(--w) } }
+.meter-note { font-size:.8rem; color:var(--ink-3); margin-top:.5rem }
+
+/* ── Compat strip ───────────────────────────────────────────────────────── */
+.compat { border-block:1px solid var(--line); padding-block:1.5rem }
+.compat-in { display:flex; align-items:center; gap:clamp(1.5rem,4vw,3rem); flex-wrap:wrap }
+.compat span { font-size:.8rem; color:var(--ink-3) }
+.compat ul { display:flex; align-items:center; gap:clamp(1.5rem,3.5vw,2.75rem); list-style:none }
+.compat .ico { width:1.5rem; height:1.5rem; color:var(--ink-2); opacity:.85 }
+
+/* ── Measured band ──────────────────────────────────────────────────────── */
+.band { padding-block:var(--sect) }
+.band-grid { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:2rem }
+@media (min-width:700px) { .band-grid { grid-template-columns:repeat(4,1fr) } }
+.band-cell { background:var(--bg); padding:clamp(1.3rem,2.4vw,1.9rem) }
+.band-cell .v { font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:clamp(1.5rem,1rem + 1.5vw,2.1rem); color:var(--ink); letter-spacing:-.02em }
+.band-cell .k { font-size:.83rem; color:var(--ink-3); margin-top:.4rem }
+.caption { font-size:.8rem; color:var(--ink-3); margin-top:1rem }
+
+/* ── Terminal + annotation rail ─────────────────────────────────────────── */
+.term-grid { display:grid; gap:clamp(1.5rem,3vw,2.5rem); align-items:start }
+@media (min-width:940px) { .term-grid { grid-template-columns:1.55fr .95fr } }
+.code { border:1px solid var(--line); background:var(--surface); overflow-x:auto }
+.code-bar { display:flex; align-items:center; gap:.6rem; padding:.7rem 1.1rem; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:.7rem; color:var(--ink-3); letter-spacing:.06em }
+.code pre { padding:1.3rem clamp(1.1rem,2.2vw,1.6rem) 1.6rem; font-family:var(--mono); font-size:clamp(.7rem,.6rem + .3vw,.82rem); line-height:1.85; color:var(--ink-2); white-space:pre; min-width:max-content }
+.code .hi { color:var(--ink); font-weight:500 }
+.code .ac { color:var(--accent); font-weight:500 }
+.code .gd { color:var(--good) }
+.rail dt { font-weight:500; color:var(--ink); font-size:.95rem }
+.rail dd { font-size:.9rem; margin-top:.35rem; color:var(--ink-2) }
+.rail div + div { margin-top:1.6rem; padding-top:1.6rem; border-top:1px solid var(--line) }
+
+/* ── Evidence bento: 6 cells for 6 measurements ─────────────────────────── */
+.bento { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:2.5rem }
+@media (min-width:660px) { .bento { grid-template-columns:repeat(2,1fr) } }
+@media (min-width:1000px) {
+  .bento { grid-template-columns:repeat(3,1fr) }
+  .cell.lead { grid-column:span 2 }
 }
-h1 em{font-style:italic;color:var(--ember)}
-h2{
-  font-family:var(--display);font-weight:400;color:var(--bead);
-  font-size:clamp(1.9rem,1.1rem + 3vw,3.4rem);line-height:1.05;letter-spacing:-.015em;
-  text-wrap:balance;
-}
-h3{font-family:var(--mono);font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ember);font-weight:500}
-.lede{font-size:clamp(1.05rem,1rem + .5vw,1.4rem);color:var(--silver);max-width:44ch;margin-top:1.5rem}
-.section{padding-block:clamp(4.5rem,11vw,9rem);position:relative}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--rim) 12%,var(--rim) 88%,transparent)}
+.cell { background:var(--bg); padding:clamp(1.4rem,2.6vw,2.1rem); display:flex; flex-direction:column }
+.cell.lead { background:var(--accent-bg) }
+.cell.tint { background:var(--surface) }
+.cell .v { font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:clamp(1.9rem,1.2rem + 2.2vw,3rem); color:var(--ink); line-height:1; letter-spacing:-.03em }
+.cell.lead .v { color:var(--accent) }
+.cell .v small { font-size:.42em; color:var(--ink-3); letter-spacing:0 }
+.cell p { font-size:.92rem; margin-top:.8rem; flex:1 }
+.cell cite { font-family:var(--mono); font-style:normal; font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3); margin-top:1.2rem }
 
-/* ---------- hero ---------- */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:6rem 3rem}
-.mark{display:flex;align-items:baseline;gap:.85rem;margin-bottom:clamp(2.5rem,7vw,5rem)}
-.mark b{font-family:var(--display);font-size:1.6rem;font-weight:400;color:var(--bead);letter-spacing:.02em}
-.mark span{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.note { border-left:2px solid var(--crit); padding:1.1rem 0 1.1rem 1.5rem; margin-top:2.5rem; max-width:60ch }
+.note b { color:var(--ink); font-weight:500 }
+.note .stamp { display:inline-block; margin-top:.9rem; font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--crit); border:1px solid var(--crit); padding:.3rem .6rem }
 
-.cmd{
-  display:inline-flex;align-items:center;gap:1rem;margin-top:2.5rem;
-  border:1px solid var(--rim);background:rgba(255,106,24,.05);
-  padding:.85rem 1rem .85rem 1.25rem;
-}
-.cmd code{font-family:var(--mono);font-size:1rem;color:var(--bead)}
-.cmd code i{color:var(--molten);font-style:normal}
-.copy{
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
-  background:none;border:1px solid var(--rim);color:var(--dim);padding:.5rem .7rem;cursor:pointer;
-  transition:color .2s,border-color .2s;
-}
-.copy:hover{color:var(--ember);border-color:var(--ember)}
+/* ── Checks ledger: rows, not equal cards ───────────────────────────────── */
+.ledger { margin-top:2.5rem; border-top:1px solid var(--line) }
+.row { display:grid; gap:.6rem 2rem; padding-block:1.8rem; border-bottom:1px solid var(--line); align-items:start }
+@media (min-width:820px) { .row { grid-template-columns:minmax(0,10rem) minmax(0,1fr) auto } }
+.row p { font-size:.95rem; max-width:60ch }
+.chip { font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; padding:.3rem .6rem; border:1px solid currentColor; justify-self:start; white-space:nowrap }
+.chip.on { color:var(--good) }
+.chip.off { color:var(--ink-3) }
 
-.status{
-  margin-top:2.25rem;display:inline-flex;align-items:center;gap:.6rem;
-  font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-}
-.dot{width:6px;height:6px;background:var(--ember);border-radius:50%;box-shadow:0 0 10px var(--ember)}
+/* ── Principles: hairline grid, no cards ────────────────────────────────── */
+.prin { display:grid; gap:2.2rem 2.5rem; margin-top:2.5rem }
+@media (min-width:720px) { .prin { grid-template-columns:repeat(2,1fr) } }
+@media (min-width:1040px) { .prin { grid-template-columns:repeat(4,1fr) } }
+.prin div { padding-top:1.1rem; border-top:1px solid var(--line-2) }
+.prin p { font-size:.9rem; margin-top:.5rem }
 
-/* ---------- window bar ---------- */
-.bar-block{margin-top:clamp(3.5rem,8vw,6rem);max-width:800px}
-.bar-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
-  font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.bar{position:relative;height:44px;margin-top:.9rem;border:1px solid var(--rim);background:var(--char);overflow:hidden}
-.bar-fill{
-  position:absolute;inset:0 auto 0 0;width:0;
-  background:linear-gradient(90deg,#c2410c,var(--molten) 60%,var(--ember));
-  animation:fill 2.1s cubic-bezier(.2,.7,.2,1) .55s forwards;
-}
-.bar-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16));}
-@keyframes fill{to{width:var(--pct)}}
-.ticks{position:absolute;inset:0;display:flex;pointer-events:none}
-.ticks i{flex:1;border-right:1px solid rgba(255,255,255,.05)}
-.ticks i:last-child{border:0}
-.bar-foot{display:flex;justify-content:space-between;margin-top:.7rem;font-family:var(--mono);font-size:.66rem;color:var(--dim)}
-.bar-note{margin-top:1.6rem;font-size:1.05rem;color:var(--silver);max-width:52ch}
-.bar-note b{color:var(--bead);font-weight:400}
-
-/* ---------- evidence ledger ---------- */
-.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--rim);margin-top:3.5rem;border:1px solid var(--rim)}
-.cell{background:var(--ash);padding:clamp(1.5rem,3vw,2.25rem)}
-.cell .n{font-family:var(--display);font-size:clamp(2.4rem,1.4rem + 3vw,3.8rem);line-height:1;color:var(--ember);letter-spacing:-.02em}
-.cell .n.warn{color:var(--molten)}
-.cell p{margin-top:.7rem;font-size:.95rem;line-height:1.5;color:var(--silver)}
-.cell cite{display:block;margin-top:.9rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-style:normal}
-
-.declined{
-  margin-top:3.5rem;border-left:2px solid var(--bad);padding:1.4rem 0 1.4rem 1.75rem;max-width:62ch;
-}
-.declined p{color:var(--silver)}
-.declined strong{color:var(--bead);font-weight:400}
-.declined .verdict{
-  display:inline-block;margin-top:1rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--bad);border:1px solid var(--bad);padding:.35rem .7rem;
-}
-
-/* ---------- pillars ---------- */
-.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(2rem,4vw,3.5rem);margin-top:3.5rem}
-.pillar{position:relative;padding-top:2.5rem;border-top:1px solid var(--rim)}
-.stamp{
-  position:absolute;top:-1.05rem;right:0;width:2.1rem;height:2.1rem;border:1px solid var(--rim);
-  border-radius:50%;display:grid;place-items:center;background:var(--ash);
-  font-family:var(--mono);font-size:.7rem;color:var(--dim);
-}
-.pillar h4{font-family:var(--display);font-weight:400;font-size:1.7rem;color:var(--bead);margin-bottom:.6rem}
-.pillar p{font-size:.98rem}
-.pillar .why{
-  margin-top:1.1rem;font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--molten);
-  letter-spacing:.04em;
-}
-
-/* ---------- terminal ---------- */
-.term{
-  margin-top:3rem;border:1px solid var(--rim);background:#0d0b09;
-  font-family:var(--mono);font-size:clamp(.66rem,.55rem + .32vw,.82rem);line-height:1.85;
-  overflow-x:auto;
-}
-.term-bar{display:flex;gap:.45rem;padding:.75rem 1rem;border-bottom:1px solid var(--rim);align-items:center}
-.term-bar i{width:9px;height:9px;border-radius:50%;background:var(--rim)}
-.term-bar span{margin-left:.6rem;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.term pre{padding:1.4rem clamp(1rem,3vw,1.9rem) 1.9rem;color:var(--silver);white-space:pre;min-width:max-content}
-.term .p{color:var(--molten)}
-.term .g-d,.term .g-f{color:var(--bad)}
-.term .g-c{color:var(--ember)}
-.term .g-b{color:#8fbf7a}
-.term .hi{color:var(--bead)}
-.term .mut{color:var(--dim)}
-.cursor{display:inline-block;width:.55em;height:1.05em;background:var(--molten);vertical-align:-.16em;animation:blink 1.15s steps(2) infinite}
-@keyframes blink{50%{opacity:0}}
-
-/* ---------- diff ---------- */
-.split{display:grid;grid-template-columns:1fr;gap:clamp(2rem,5vw,4rem);align-items:start}
-@media(min-width:900px){.split{grid-template-columns:.85fr 1.15fr}}
-.diff{border:1px solid var(--rim);background:#0d0b09;font-family:var(--mono);
-  font-size:clamp(.68rem,.58rem + .3vw,.82rem);line-height:1.95;overflow-x:auto}
-.diff pre{padding:1.5rem clamp(1rem,3vw,1.8rem);white-space:pre;min-width:max-content}
-.diff .add{color:#8fbf7a}
-.diff .rm{color:var(--bad)}
-.diff .hd{color:var(--bead)}
-.diff .mut{color:var(--dim)}
-
-/* ---------- principles ---------- */
-.prin{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2.5rem;margin-top:3rem}
-.prin div p{font-size:.96rem;margin-top:.55rem}
-.prin div strong{font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--bead);display:block}
-
-/* ---------- cta / footer ---------- */
-.cta{text-align:center;padding-block:clamp(5rem,12vw,10rem)}
-.cta h2{margin-inline:auto;max-width:16ch}
-.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2.5rem}
-.btn{
-  font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
-  padding:1rem 1.9rem;border:1px solid var(--rim);color:var(--silver);text-decoration:none;
-  transition:all .22s;
-}
-.btn:hover{color:var(--ash);background:var(--ember);border-color:var(--ember)}
-.btn.solid{background:var(--molten);border-color:var(--molten);color:#140c05}
-.btn.solid:hover{background:var(--ember);border-color:var(--ember)}
-
-footer{border-top:1px solid var(--rim);padding-block:3rem;font-family:var(--mono);font-size:.68rem;color:var(--dim)}
-.frow{display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;align-items:center}
-footer a{color:var(--silver);text-decoration:none;border-bottom:1px solid var(--rim)}
-footer a:hover{color:var(--ember);border-color:var(--ember)}
-
-a.q{color:var(--ember);text-decoration:none;border-bottom:1px solid rgba(255,166,43,.3)}
-a.q:hover{border-color:var(--ember)}
+/* ── Close ──────────────────────────────────────────────────────────────── */
+.close { padding-block:var(--sect); border-top:1px solid var(--line) }
+footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82rem; color:var(--ink-3) }
+.foot-in { display:flex; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; align-items:center }
+.foot-in a { text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; color:var(--ink-2); transition:color .18s }
+.foot-in a:hover { color:var(--accent) }
 </style>
 </head>
 <body>
-<div class="glow" aria-hidden="true"></div>
 
-<!-- ══════════ HERO ══════════ -->
-<header class="hero wrap">
-  <div class="mark rv" style="animation-delay:.05s">
-    <b>cupel</b>
-    <span>fire assay for agent extensions</span>
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">cupel</a>
+    <div class="nav-links">
+      <a href="https://github.com/mihhhir08/cupel/blob/main/docs/PRD.md">Docs</a>
+      <a href="https://github.com/mihhhir08/cupel">GitHub</a>
+    </div>
   </div>
+</nav>
 
-  <p class="eyebrow rv" style="animation-delay:.15s">Nobody has ever assayed what your agent loads</p>
-
-  <h1 class="rv" style="animation-delay:.25s">
-    You have no idea<br>what your extensions<br><em>can reach.</em>
-  </h1>
-
-  <p class="lede rv" style="animation-delay:.4s">
-    One command grades every skill, plugin, and MCP server your coding agent
-    loads — what it costs you, what it can touch, and whether it's any good.
-  </p>
-
-  <div class="cmd rv" style="animation-delay:.52s">
-    <code><i>$</i> npx cupel</code>
-    <button class="copy" id="copy" type="button">copy</button>
-  </div>
-
-  <p class="status rv" style="animation-delay:.62s">
-    <span class="dot"></span> Cost pillar shipped · safety and quality next
-  </p>
-
-  <!-- the visceral moment -->
-  <div class="bar-block rv" style="animation-delay:.72s">
-    <div class="bar-head">
-      <span>Your context window</span>
-      <span>200,000 tokens</span>
+<header class="hero wrap" id="top">
+  <div class="hero-grid">
+    <div>
+      <h1>You have never read<br>what your agent loads.</h1>
+      <p class="lede">cupel grades every skill and MCP server on your machine. What it
+      costs, what it can reach, whether it works.</p>
+      <div class="cta-row">
+        <div class="cmd">
+          <code><b>$</b> npx cupel</code>
+          <button class="copy" id="copy" type="button">Copy</button>
+        </div>
+        <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
+      </div>
     </div>
-    <div class="bar">
-      <div class="bar-fill" style="--pct:96.2%"></div>
-      <div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+    <div class="gauge">
+      <div class="gauge-head">
+        <span class="eyebrow">Context window</span>
+        <span class="num">200,000</span>
+      </div>
+      <div class="meter">
+        <div class="meter-top"><b>Loaded every turn</b><span class="num">5,758</span></div>
+        <div class="track"><div class="fill lo" style="--w:2.9%"></div></div>
+        <p class="meter-note">2.9% of the window, paid on every request.</p>
+      </div>
+      <div class="meter">
+        <div class="meter-top"><b>If every skill fires</b><span class="num">192,446</span></div>
+        <div class="track"><div class="fill" style="--w:96.2%"></div></div>
+        <p class="meter-note">96.2% of the window, before any of your code.</p>
+      </div>
     </div>
-    <div class="bar-foot">
-      <span>192,446 tokens</span>
-      <span>96.2%</span>
-    </div>
-    <p class="bar-note">
-      That is one real machine — <b>83 installed extensions</b>, measured by
-      cupel. Nearly a full context window, and not one line of your code in it yet.
-    </p>
   </div>
 </header>
 
-<div class="wrap"><div class="rule"></div></div>
+<div class="compat">
+  <div class="wrap compat-in">
+    <span>Reads configuration from</span>
+    <ul>
+      <li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Anthropic" fill="currentColor"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg></li>
+      <li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Cursor" fill="currentColor"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg></li>
+    </ul>
+  </div>
+</div>
 
-<!-- ══════════ EVIDENCE ══════════ -->
-<section class="section wrap">
-  <h3>The measurements</h3>
-  <h2 style="margin-top:1.2rem;max-width:20ch">Distribution arrived. Every quality gate was skipped.</h2>
-  <p class="lede">
-    In eighteen months, coding agents went from no extension model to eight
-    marketplaces. None of it came with verified publishers, provenance, an audit
-    command, or a lockfile.
-  </p>
+<section class="band wrap rev">
+  <h2>One real machine, measured.</h2>
+  <div class="band-grid">
+    <div class="band-cell"><div class="v">83</div><div class="k">extensions found</div></div>
+    <div class="band-cell"><div class="v">5,758</div><div class="k">tokens every turn</div></div>
+    <div class="band-cell"><div class="v">192,446</div><div class="k">tokens if all fire</div></div>
+    <div class="band-cell"><div class="v">96.2%</div><div class="k">of a 200K window</div></div>
+  </div>
+  <p class="caption">Output from the author's own install. Nothing here is illustrative.</p>
+</section>
 
-  <div class="ledger">
-    <div class="cell">
-      <div class="n warn">36%</div>
-      <p>of 3,984 scanned skills carry prompt-injection flaws. 76 had live payloads.</p>
-      <cite>Snyk ToxicSkills · Feb 2026</cite>
+<section class="wrap rev" style="padding-bottom:var(--sect)">
+  <div class="term-grid">
+    <div class="code">
+      <div class="code-bar">npx cupel</div>
+<pre>  <span class="hi">Assayed 83 extensions</span>
+
+  <span class="gd">A</span>  math-olympiad          <span class="ac">180 tok</span>   0% of window  +4,757 on use
+  <span class="gd">A</span>  hook-development       <span class="ac">136 tok</span>   0% of window  +3,909 on use
+  <span class="gd">A</span>  command-development    <span class="ac">128 tok</span>   0% of window  +4,628 on use
+  <span class="gd">A</span>  build-mcp-app          <span class="ac">117 tok</span>   0% of window  +4,616 on use
+  ...
+
+  <span class="hi">Token tax</span>  <span class="ac">5,758 tokens per turn</span>  3% of your window
+  <span class="hi">On use</span>     192,446 tokens if every extension fires
+  <span class="hi">Verdict</span>    <span class="gd">A</span></pre>
+    </div>
+    <dl class="rail">
+      <div>
+        <dt>Token tax</dt>
+        <dd>Names and descriptions stay resident so the agent knows what it can
+        reach for. You pay this on every single request.</dd>
+      </div>
+      <div>
+        <dt>On use</dt>
+        <dd>Skill bodies load only when invoked. This is what arrives if all of
+        them fire in one session.</dd>
+      </div>
+      <div>
+        <dt>Verdict</dt>
+        <dd>Your worst pillar, never the average. A skill that is cheap, elegant
+        and unsafe does not get a B.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap rev" style="padding-bottom:var(--sect)">
+  <p class="eyebrow">Why this exists</p>
+  <h2 style="margin-top:.9rem">Distribution arrived. Every quality gate was skipped.</h2>
+  <p style="margin-top:1.1rem">Coding agents went from no extension model to eight marketplaces in
+  eighteen months, with no verified publishers, no provenance, and no audit command.</p>
+
+  <div class="bento">
+    <div class="cell lead">
+      <div class="v">36%</div>
+      <p>of 3,984 scanned skills carry prompt-injection flaws. Seventy six shipped
+      with live payloads.</p>
+      <cite>Snyk ToxicSkills, Feb 2026</cite>
     </div>
     <div class="cell">
-      <div class="n warn">12%</div>
+      <div class="v">12%</div>
       <p>of 2,857 ClawHub skills were outright malicious.</p>
-      <cite>Independent audit · 2026</cite>
+      <cite>Independent audit, 2026</cite>
+    </div>
+    <div class="cell tint">
+      <div class="v">1,184</div>
+      <p>skills poisoned in the ClawHavoc campaign, delivered through updates.</p>
+      <cite>OWASP, Apr 2026</cite>
     </div>
     <div class="cell">
-      <div class="n">1,184</div>
-      <p>skills poisoned in the ClawHavoc campaign — delivered <em>through updates</em>.</p>
-      <cite>OWASP · Apr 2026</cite>
+      <div class="v">6.2<small> / 12</small></div>
+      <p>mean quality across 47,150 public skills. Curated sets lift agent pass
+      rates by 16.2 points.</p>
+      <cite>SkillsBench, 2026</cite>
+    </div>
+    <div class="cell tint">
+      <div class="v">42,000</div>
+      <p>tokens of tool schemas from one MCP server, or 21% of a 200K window.</p>
+      <cite>Measured, 2026</cite>
     </div>
     <div class="cell">
-      <div class="n">6.2<span style="font-size:.4em;color:var(--dim)"> / 12</span></div>
-      <p>mean quality score across 47,150 public skills. Curated skills lift agent pass rates by 16.2 points.</p>
-      <cite>SkillsBench · 2026</cite>
-    </div>
-    <div class="cell">
-      <div class="n">42,000</div>
-      <p>tokens of tool schemas from a single MCP server — 21% of a 200K window.</p>
-      <cite>Measured · 2026</cite>
-    </div>
-    <div class="cell">
-      <div class="n warn">$2.3B</div>
-      <p>direct losses attributed to prompt injection in 2026. Up 340% year over year.</p>
-      <cite>Recorded Future · 2026</cite>
+      <div class="v">$2.3B</div>
+      <p>in direct losses attributed to prompt injection, up 340% year over year.</p>
+      <cite>Recorded Future, 2026</cite>
     </div>
   </div>
 
-  <div class="declined">
-    <p>
-      <strong>A verified marketplace was formally requested</strong> — publisher
-      identity, security review, code signing — in
-      <a class="q" href="https://github.com/anthropics/claude-code/issues/30727">anthropics/claude-code#30727</a>.
-    </p>
-    <span class="verdict">Closed as not planned</span>
-    <p style="margin-top:1.1rem">So nobody is coming. Run the assay yourself.</p>
-  </div>
-</section>
-
-<div class="wrap"><div class="rule"></div></div>
-
-<!-- ══════════ PILLARS ══════════ -->
-<section class="section wrap">
-  <h3>Three pillars, one verdict</h3>
-  <h2 style="margin-top:1.2rem;max-width:22ch">Your verdict is your worst pillar. Never the average.</h2>
-  <p class="lede">
-    A skill that is elegant, cheap, and insecure is not a B+. Averaging hides
-    exactly the failure this tool exists to surface.
-  </p>
-
-  <div class="pillars">
-    <div class="pillar">
-      <div class="stamp">S</div>
-      <h4>Safety</h4>
-      <p>
-        Injection patterns in tool descriptions, hidden Unicode and homoglyphs,
-        credential-path reach, network egress, shell surface, provenance.
-      </p>
-      <p class="why">→ because 36% of scanned skills are flawed</p>
-    </div>
-    <div class="pillar">
-      <div class="stamp">C</div>
-      <h4>Cost</h4>
-      <p>
-        Token weight of every tool schema and skill body, the tax they impose per
-        turn, your share of window consumed, projected spend.
-      </p>
-      <p class="why">→ because one server can eat 21% of your window</p>
-    </div>
-    <div class="pillar">
-      <div class="stamp">Q</div>
-      <h4>Quality</h4>
-      <p>
-        Structure, trigger clarity, length against usefulness, and semantic
-        overlap with the other skills you already have installed.
-      </p>
-      <p class="why">→ because curation is worth +16.2 points of pass rate</p>
-    </div>
-  </div>
-
-  <div class="term">
-    <div class="term-bar"><i></i><i></i><i></i><span>npx cupel — safety pillar in development</span></div>
-<pre><span class="mut">  Assaying 22 extensions ...</span>
-
-  <span class="hi">┌ SAFETY ──────────────────────────────────────────────────┐</span>
-  <span class="hi">│</span>  <span class="g-d">D</span>   notion-mcp        <span class="mut">reads ~/.config/gh, egress ×3</span>      <span class="hi">│</span>
-  <span class="hi">│</span>  <span class="g-c">C</span>   pdf-wizard        <span class="mut">hidden unicode in description</span>     <span class="hi">│</span>
-  <span class="hi">│</span>  <span class="g-b">B</span>   sql-runner        <span class="mut">shell exec surface</span>                <span class="hi">│</span>
-  <span class="hi">└──────────────────────────────────────────────────────────┘</span>
-
-  <span class="hi">┌ COST ────────────────────────────────────────────────────┐</span>
-  <span class="hi">│</span>  github-mcp        <span class="p">41,900 tok</span>    <span class="mut">21% of window</span>  $0.13/turn <span class="hi">│</span>
-  <span class="hi">│</span>  playwright-mcp    <span class="p">14,300 tok</span>     <span class="mut">7% of window</span>  $0.04/turn <span class="hi">│</span>
-  <span class="hi">└──────────────────────────────────────────────────────────┘</span>
-
-  <span class="hi">Token tax</span>    <span class="p">63,400 tokens per turn</span> <span class="mut">— 32% of your window</span>
-  <span class="hi">Verdict</span>      <span class="g-d">D</span>    <span class="mut">2 extensions need attention</span>
-
-  <span class="mut">cupel explain notion-mcp     cupel lock</span><span class="cursor"></span></pre>
+  <div class="note">
+    <p><b>A verified marketplace was formally requested.</b> Publisher identity,
+    security review, code signing, filed as
+    <a class="ghost" href="https://github.com/anthropics/claude-code/issues/30727">claude-code issue 30727</a>.</p>
+    <span class="stamp">Closed as not planned</span>
+    <p style="margin-top:1rem">Nobody is coming. Run the assay yourself.</p>
   </div>
 </section>
 
-<div class="wrap"><div class="rule"></div></div>
-
-<!-- ══════════ DIFF ══════════ -->
-<section class="section wrap">
-  <h3>The part nobody else does</h3>
-  <div class="split" style="margin-top:1.2rem">
-    <div>
-      <h2 style="max-width:14ch">Every scanner is blind to time.</h2>
-      <p class="lede">
-        A scanner tells you a thing looks fine <em>today</em>. ClawHavoc poisoned
-        1,184 skills <b style="color:var(--bead);font-weight:400">through updates</b> —
-        the attack that actually happened is a change over time.
-      </p>
-      <p style="margin-top:1.5rem;max-width:44ch">
-        <code style="font-family:var(--mono);color:var(--ember)">cupel diff</code>
-        keeps a lockfile and reports what changed. Rug-pull detection, running
-        locally, on your machine.
-      </p>
+<section class="wrap rev" style="padding-bottom:var(--sect)">
+  <h2>Three pillars, one verdict.</h2>
+  <div class="ledger">
+    <div class="row">
+      <h3>Cost</h3>
+      <p>Token weight of every tool schema and skill body, split into what you pay
+      per turn and what waits until invocation.</p>
+      <span class="chip on">Shipped</span>
     </div>
-    <div class="diff">
-<pre><span class="hd">CHANGED  github-mcp  2.2.0 -> 2.3.0</span>
-
-  <span class="add">+ reads  ~/.aws/credentials</span>          <span class="mut">(new)</span>
-  <span class="add">+ egress api.telemetry-collect.net</span>   <span class="mut">(new)</span>
-  <span class="rm">! safety  A- -> D</span>
-
-<span class="mut">  1 extension acquired new capabilities
-  since your last lock.</span></pre>
+    <div class="row">
+      <h3>Safety</h3>
+      <p>Injection patterns, hidden Unicode and homoglyphs, credential path reach,
+      network egress, shell surface, provenance.</p>
+      <span class="chip off">In progress</span>
+    </div>
+    <div class="row">
+      <h3>Quality</h3>
+      <p>Structure, trigger clarity, length against usefulness, and semantic
+      overlap with the other skills you already have.</p>
+      <span class="chip off">Planned</span>
     </div>
   </div>
 </section>
 
-<div class="wrap"><div class="rule"></div></div>
+<section class="wrap rev" style="padding-bottom:var(--sect)">
+  <p class="eyebrow">Planned</p>
+  <h2 style="margin-top:.9rem; max-width:18ch">Every scanner is blind to time.</h2>
+  <p style="margin-top:1.1rem">ClawHavoc poisoned 1,184 skills through updates. The attack that actually
+  happened is a change over time, and a stateless scanner cannot see it. cupel keeps a
+  lockfile and reports what moved.</p>
+  <div class="code" style="margin-top:2rem">
+    <div class="code-bar">cupel diff</div>
+<pre><span class="hi">CHANGED  github-mcp  2.2.0 to 2.3.0</span>
 
-<!-- ══════════ PRINCIPLES ══════════ -->
-<section class="section wrap">
-  <h3>Non-negotiable</h3>
+  <span class="ac">+ reads  ~/.aws/credentials</span>          (new)
+  <span class="ac">+ egress api.telemetry-collect.net</span>   (new)
+  ! safety  A- to D
+
+  1 extension acquired new capabilities since your last lock.</pre>
+  </div>
+</section>
+
+<section class="wrap rev" style="padding-bottom:var(--sect)">
+  <h2>Non-negotiable.</h2>
   <div class="prin">
     <div>
-      <strong>No network.</strong>
-      <p>Zero calls in the default path — enforced by test, not by promise. A tool that audits trust cannot itself be a data-collection channel.</p>
+      <h3>No network</h3>
+      <p>Zero calls in the default path, enforced by a test rather than a promise.</p>
     </div>
     <div>
-      <strong>No account. No telemetry.</strong>
-      <p>Nothing leaves your machine. Ever. Credential values in your config files are never read, never stored, never rendered.</p>
+      <h3>No account, no telemetry</h3>
+      <p>Credential values in your config files are never read, stored, or rendered.</p>
     </div>
     <div>
-      <strong>Cross-platform.</strong>
-      <p>Existing runtime tools are Linux-kernel-only — Landlock, seccomp — or enterprise platforms. Cupel runs on your Mac.</p>
+      <h3>Cross-platform</h3>
+      <p>Existing runtime tools are Linux kernel only. This runs on your Mac.</p>
     </div>
     <div>
-      <strong>Rules are data.</strong>
-      <p>Detection rules are versioned YAML with their own test cases. Contribute one without reading a line of TypeScript.</p>
+      <h3>Rules are data</h3>
+      <p>Detection rules are versioned YAML with their own cases. Contribute without TypeScript.</p>
     </div>
   </div>
 </section>
 
-<div class="wrap"><div class="rule"></div></div>
-
-<!-- ══════════ CTA ══════════ -->
-<section class="cta wrap">
-  <p class="eyebrow">A cupel is the vessel that reveals what a metal is actually made of</p>
-  <h2 style="margin-top:1.4rem">Heat it. See what survives.</h2>
-  <div class="btns">
-    <a class="btn solid" href="https://github.com/mihhhir08/cupel">Star on GitHub</a>
-    <a class="btn" href="https://github.com/mihhhir08/cupel/blob/main/docs/PRD.md">Read the PRD</a>
+<section class="close wrap rev">
+  <h2 style="max-width:16ch">Find out what you already installed.</h2>
+  <div class="cta-row">
+    <div class="cmd">
+      <code><b>$</b> npx cupel</code>
+      <button class="copy" type="button">Copy</button>
+    </div>
+    <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
   </div>
 </section>
 
 <footer class="wrap">
-  <div class="frow">
-    <span>cupel — Apache-2.0 · <a href="https://github.com/mihhhir08/cupel">github.com/mihhhir08/cupel</a></span>
-    <span>Built by <a href="https://github.com/mihhhir08">Mihirsinh Chavda</a></span>
+  <div class="foot-in">
+    <span>Apache 2.0, built by Mihirsinh Chavda</span>
+    <span style="display:flex; gap:1.5rem">
+      <a href="https://github.com/mihhhir08/cupel"><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="GitHub" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg> GitHub</a>
+      <a href="https://www.npmjs.com/package/cupel"><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="npm" fill="currentColor"><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"/></svg> npm</a>
+    </span>
   </div>
 </footer>
 
 <script>
-document.getElementById('copy').addEventListener('click', async (e) => {
-  const btn = e.currentTarget;
-  try {
-    await navigator.clipboard.writeText('npx cupel');
-    btn.textContent = 'copied';
-  } catch {
-    btn.textContent = 'select it';
-  }
-  setTimeout(() => { btn.textContent = 'copy'; }, 1600);
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', async function () {
+    try {
+      await navigator.clipboard.writeText('npx cupel');
+      btn.textContent = 'Copied';
+    } catch {
+      btn.textContent = 'Select it';
+    }
+    setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+  });
 });
+
+/* Reveal on entry. IntersectionObserver, never a scroll listener. */
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+  document.querySelectorAll('.rev').forEach(function (el) { io.observe(el); });
+} else {
+  document.querySelectorAll('.rev').forEach(function (el) { el.classList.add('in'); });
+}
 </script>
 </body>
 </html>
