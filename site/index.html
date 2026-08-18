@@ -10,212 +10,188 @@
 <link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* Self-hosted Geist (SIL OFL). No external font requests. */
-@font-face {
-  font-family: 'Geist';
-  src: url('fonts/Geist-Variable.woff2') format('woff2-variations');
-  font-weight: 100 900; font-display: swap; font-style: normal;
-}
-@font-face {
-  font-family: 'Geist Mono';
-  src: url('fonts/GeistMono-Variable.woff2') format('woff2-variations');
-  font-weight: 100 900; font-display: swap; font-style: normal;
-}
+@font-face { font-family:'Geist'; src:url('fonts/Geist-Variable.woff2') format('woff2-variations');
+  font-weight:100 900; font-display:swap; font-style:normal }
+@font-face { font-family:'Geist Mono'; src:url('fonts/GeistMono-Variable.woff2') format('woff2-variations');
+  font-weight:100 900; font-display:swap; font-style:normal }
 
-/* ── Tokens. Light is the base; dark redefines tokens only. ────────────── */
 :root {
-  --bg:        #f2f2ef;
-  --surface:   #ffffff;
-  --surface-2: #ececea;
-  --ink:       #16171a;
-  --ink-2:     #55585f;
-  --ink-3:     #8a8d95;
-  --line:      #dedcd6;
-  --line-2:    #c9c7c0;
-  --accent:    #2c3fd4;
-  --accent-bg: rgba(44,63,212,.07);
-  --good:      #1f6f45;
-  --warn:      #8a5a12;
-  --crit:      #b02a1f;
-
-  --sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-
-  --pad: clamp(1.25rem, 4vw, 4.5rem);
-  --maxw: 1240px;
-  --sect: clamp(4rem, 9vw, 7.5rem);
+  --bg:#efeeea; --surface:#fbfbf9; --recess:#e4e3dd;
+  --ink:#14151a; --ink-2:#4e515a; --ink-3:#8b8e97;
+  --line:#dbd9d2; --line-2:#c4c2ba;
+  --accent:#2436c9; --accent-2:rgba(36,54,201,.26); --accent-bg:rgba(36,54,201,.06);
+  --good:#1c6b42; --crit:#a8281d;
+  --sans:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --pad:clamp(1.25rem,4vw,4.5rem); --maxw:1240px; --sect:clamp(4rem,9vw,7.5rem);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg:        #101114;
-    --surface:   #17181c;
-    --surface-2: #1d1f24;
-    --ink:       #eceded;
-    --ink-2:     #a4a8b0;
-    --ink-3:     #71757f;
-    --line:      #26282e;
-    --line-2:    #33363d;
-    --accent:    #8494ff;
-    --accent-bg: rgba(132,148,255,.10);
-    --good:      #4aa877;
-    --warn:      #c79541;
-    --crit:      #e0685c;
-  }
-}
+@media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+  --bg:#0e0f12; --surface:#15171b; --recess:#0a0b0d;
+  --ink:#eef0f1; --ink-2:#a3a7b0; --ink-3:#6e727b;
+  --line:#24262c; --line-2:#32353c;
+  --accent:#8b9bff; --accent-2:rgba(139,155,255,.24); --accent-bg:rgba(139,155,255,.08);
+  --good:#4aa877; --crit:#e0685c;
+} }
 :root[data-theme="dark"] {
-  --bg:#101114; --surface:#17181c; --surface-2:#1d1f24;
-  --ink:#eceded; --ink-2:#a4a8b0; --ink-3:#71757f;
-  --line:#26282e; --line-2:#33363d;
-  --accent:#8494ff; --accent-bg:rgba(132,148,255,.10);
-  --good:#4aa877; --warn:#c79541; --crit:#e0685c;
+  --bg:#0e0f12; --surface:#15171b; --recess:#0a0b0d;
+  --ink:#eef0f1; --ink-2:#a3a7b0; --ink-3:#6e727b;
+  --line:#24262c; --line-2:#32353c;
+  --accent:#8b9bff; --accent-2:rgba(139,155,255,.24); --accent-bg:rgba(139,155,255,.08);
+  --good:#4aa877; --crit:#e0685c;
 }
 
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
-html { -webkit-text-size-adjust:100% }
-body {
-  background:var(--bg); color:var(--ink-2);
-  font-family:var(--sans); font-size:1rem; line-height:1.6;
-  -webkit-font-smoothing:antialiased; overflow-x:hidden;
-}
-/* One radius system: sharp. Every panel, button and chip is square. */
-.panel,.btn,.chip,.cell,.code { border-radius:0 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink-2);font-family:var(--sans);
+  font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.panel,.btn,.chip,.cell,.code,.b{border-radius:0}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--pad)}
+h1,h2,h3{color:var(--ink);font-weight:500;letter-spacing:-.028em;text-wrap:balance}
+h1{font-size:clamp(2.3rem,1.5rem + 3.3vw,4.2rem);line-height:1.02}
+h2{font-size:clamp(1.7rem,1.2rem + 2vw,2.7rem);line-height:1.08}
+h3{font-size:1.0625rem;letter-spacing:-.01em}
+p{max-width:65ch}
+a{color:inherit}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.ico{width:1.15rem;height:1.15rem;display:block}
 
-.wrap { max-width:var(--maxw); margin-inline:auto; padding-inline:var(--pad) }
-h1,h2,h3 { color:var(--ink); font-weight:500; letter-spacing:-.025em; text-wrap:balance }
-h1 { font-size:clamp(2.3rem,1.5rem + 3.3vw,4.2rem); line-height:1.03 }
-h2 { font-size:clamp(1.65rem,1.2rem + 1.9vw,2.6rem); line-height:1.1 }
-h3 { font-size:1.0625rem; letter-spacing:-.01em }
-p  { max-width:65ch }
-a  { color:inherit }
-.num { font-family:var(--mono); font-variant-numeric:tabular-nums; font-feature-settings:"tnum" }
-.eyebrow {
-  font-family:var(--mono); font-size:.7rem; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--ink-3);
-}
-.ico { width:1.15rem; height:1.15rem; display:block }
-
-/* ── Motion. Reveal communicates sequence; gauge fill shows measurement. ─ */
-.rev { opacity:0; transform:translateY(14px); transition:opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1) }
-.rev.in { opacity:1; transform:none }
-@media (prefers-reduced-motion:reduce) {
-  .rev { opacity:1; transform:none; transition:none }
-  .fill { animation:none !important; width:var(--w) !important }
+.rev{opacity:0;transform:translateY(14px);
+  transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rev.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .rev{opacity:1;transform:none;transition:none}
+  .b{animation:none!important;opacity:1!important}
 }
 
-/* ── Nav ────────────────────────────────────────────────────────────────── */
-nav { border-bottom:1px solid var(--line); background:var(--bg); position:sticky; top:0; z-index:20 }
-.nav-in { height:64px; display:flex; align-items:center; justify-content:space-between; gap:1.5rem }
-.brand { font-weight:600; color:var(--ink); letter-spacing:-.02em; font-size:1.0625rem; text-decoration:none }
-.nav-links { display:flex; align-items:center; gap:1.6rem; font-size:.875rem }
-.nav-links a { text-decoration:none; color:var(--ink-2); transition:color .18s }
-.nav-links a:hover { color:var(--ink) }
-.nav-links a:focus-visible,.btn:focus-visible,.copy:focus-visible { outline:2px solid var(--accent); outline-offset:3px }
+nav{border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:20}
+.nav-in{height:64px;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.brand{font-weight:600;color:var(--ink);letter-spacing:-.02em;font-size:1.0625rem;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem;font-size:.875rem}
+.nav-links a{text-decoration:none;color:var(--ink-2);transition:color .18s}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a:focus-visible,.copy:focus-visible,.ghost:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
-/* ── Hero: asymmetric split, copy left, live measurement right ─────────── */
-.hero { padding-block:clamp(2.5rem,5vw,4.5rem) clamp(3rem,6vw,5rem) }
-.hero-grid { display:grid; gap:clamp(2.5rem,5vw,4rem); align-items:center }
-@media (min-width:940px) { .hero-grid { grid-template-columns:1.05fr .95fr } }
-.hero p.lede { margin-top:1.4rem; font-size:clamp(1.02rem,.98rem + .35vw,1.2rem); max-width:46ch }
-.cta-row { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; margin-top:2.2rem }
-.cmd {
-  display:inline-flex; align-items:stretch; border:1px solid var(--line-2); background:var(--surface);
-}
-.cmd code { font-family:var(--mono); font-size:.925rem; color:var(--ink); padding:.8rem 1rem; white-space:nowrap }
-.cmd code b { color:var(--ink-3); font-weight:400; user-select:none }
-.copy {
-  font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
-  border:0; border-left:1px solid var(--line); background:var(--surface-2); color:var(--ink-2);
-  padding-inline:.95rem; cursor:pointer; transition:background .18s,color .18s;
-}
-.copy:hover { background:var(--accent); color:#fff }
-.ghost { font-size:.9rem; color:var(--ink-2); text-decoration:none; border-bottom:1px solid var(--line-2); padding-bottom:2px; transition:color .18s,border-color .18s }
-.ghost:hover { color:var(--accent); border-color:var(--accent) }
+.hero{padding-block:clamp(2.5rem,5vw,4rem) clamp(3rem,6vw,4.5rem)}
+.hero-grid{display:grid;gap:clamp(2.5rem,5vw,4rem);align-items:center}
+@media (min-width:980px){.hero-grid{grid-template-columns:1fr 1.02fr}}
+.hero p.lede{margin-top:1.4rem;font-size:clamp(1.02rem,.98rem + .35vw,1.2rem);max-width:46ch}
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin-top:2.2rem}
+.cmd{display:inline-flex;align-items:stretch;border:1px solid var(--line-2);background:var(--surface)}
+.cmd code{font-family:var(--mono);font-size:.925rem;color:var(--ink);padding:.8rem 1rem;white-space:nowrap}
+.cmd code b{color:var(--ink-3);font-weight:400;user-select:none}
+.copy{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:0;
+  border-left:1px solid var(--line);background:var(--recess);color:var(--ink-2);padding-inline:.95rem;
+  cursor:pointer;transition:background .18s,color .18s}
+.copy:hover{background:var(--accent);color:#fff}
+.copy:active{transform:translateY(1px)}
+.ghost{font-size:.9rem;color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line-2);
+  padding-bottom:2px;transition:color .18s,border-color .18s}
+.ghost:hover{color:var(--accent);border-color:var(--accent)}
 
-/* gauge */
-.gauge { border:1px solid var(--line); background:var(--surface); padding:clamp(1.4rem,2.6vw,2rem) }
-.gauge-head { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; padding-bottom:1.1rem; border-bottom:1px solid var(--line) }
-.gauge-head span:last-child { font-family:var(--mono); font-size:.8rem; color:var(--ink) }
-.meter { margin-top:1.5rem }
-.meter + .meter { margin-top:1.6rem }
-.meter-top { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; font-size:.85rem; margin-bottom:.5rem }
-.meter-top b { font-weight:500; color:var(--ink) }
-.meter-top .num { color:var(--ink); font-size:.85rem }
-.track { height:12px; background:var(--surface-2); border:1px solid var(--line); position:relative; overflow:hidden }
-.fill { position:absolute; inset:0 auto 0 0; width:0; background:var(--accent); animation:grow 1.5s cubic-bezier(.16,1,.3,1) .35s forwards }
-.fill.lo { background:var(--ink-3); animation-delay:.15s }
-@keyframes grow { to { width:var(--w) } }
-.meter-note { font-size:.8rem; color:var(--ink-3); margin-top:.5rem }
+/* ── The readout. 200 blocks, one per 1,000 tokens. This is the argument. ── */
+.readout{border:1px solid var(--line-2);background:var(--surface);padding:clamp(1.2rem,2.4vw,1.75rem)}
+.ro-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+  padding-bottom:1rem;border-bottom:1px solid var(--line)}
+.ro-head .num{color:var(--ink);font-size:.8rem}
+.grid-wrap{margin-top:1.25rem;padding:.75rem;background:var(--recess);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.07)}
+.grid{display:grid;grid-template-columns:repeat(20,1fr);gap:2px}
+.b{aspect-ratio:1;background:var(--bg);border:1px solid var(--line);
+  opacity:0;animation:pop .45s cubic-bezier(.16,1,.3,1) var(--d) forwards}
+.b.on{background:var(--accent);border-color:var(--accent)}
+.b.use{background:var(--accent-2);border-color:transparent}
+.b.free{background:transparent;border-color:var(--line-2);border-style:dashed}
+@keyframes pop{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+/* calibration scale */
+.ticks{display:flex;justify-content:space-between;margin-top:.6rem;font-family:var(--mono);
+  font-size:.62rem;color:var(--ink-3);letter-spacing:.04em}
+.legend{display:grid;gap:.6rem;margin-top:1.25rem}
+.lg{display:flex;align-items:center;gap:.7rem;font-size:.85rem}
+.sw{width:11px;height:11px;flex:none;border:1px solid var(--line)}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.use{background:var(--accent-2);border-color:transparent}
+.sw.free{background:transparent;border-color:var(--line-2);border-style:dashed}
+.lg .num{margin-left:auto;color:var(--ink);font-size:.82rem}
 
-/* ── Compat strip ───────────────────────────────────────────────────────── */
-.compat { border-block:1px solid var(--line); padding-block:1.5rem }
-.compat-in { display:flex; align-items:center; gap:clamp(1.5rem,4vw,3rem); flex-wrap:wrap }
-.compat span { font-size:.8rem; color:var(--ink-3) }
-.compat ul { display:flex; align-items:center; gap:clamp(1.5rem,3.5vw,2.75rem); list-style:none }
-.compat .ico { width:1.5rem; height:1.5rem; color:var(--ink-2); opacity:.85 }
+.compat{border-block:1px solid var(--line);padding-block:1.5rem}
+.compat-in{display:flex;align-items:center;gap:clamp(1.5rem,4vw,3rem);flex-wrap:wrap}
+.compat span{font-size:.8rem;color:var(--ink-3)}
+.compat ul{display:flex;align-items:center;gap:clamp(1.5rem,3.5vw,2.75rem);list-style:none}
+.compat .ico{width:1.5rem;height:1.5rem;color:var(--ink-2);opacity:.85}
 
-/* ── Measured band ──────────────────────────────────────────────────────── */
-.band { padding-block:var(--sect) }
-.band-grid { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:2rem }
-@media (min-width:700px) { .band-grid { grid-template-columns:repeat(4,1fr) } }
-.band-cell { background:var(--bg); padding:clamp(1.3rem,2.4vw,1.9rem) }
-.band-cell .v { font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:clamp(1.5rem,1rem + 1.5vw,2.1rem); color:var(--ink); letter-spacing:-.02em }
-.band-cell .k { font-size:.83rem; color:var(--ink-3); margin-top:.4rem }
-.caption { font-size:.8rem; color:var(--ink-3); margin-top:1rem }
+/* ── The one loud moment. ─────────────────────────────────────────────── */
+.shout{padding-block:var(--sect);border-bottom:1px solid var(--line)}
+.shout-in{display:grid;gap:clamp(1.5rem,4vw,3.5rem);align-items:center}
+@media (min-width:860px){.shout-in{grid-template-columns:auto 1fr}}
+.big{font-family:var(--mono);font-weight:500;color:var(--accent);line-height:.82;
+  font-size:clamp(6rem,4rem + 16vw,15rem);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.big sub{font-size:.19em;color:var(--ink-3);vertical-align:baseline;letter-spacing:0;bottom:0}
+.shout h2{max-width:16ch}
+.shout p{margin-top:1.1rem}
 
-/* ── Terminal + annotation rail ─────────────────────────────────────────── */
-.term-grid { display:grid; gap:clamp(1.5rem,3vw,2.5rem); align-items:start }
-@media (min-width:940px) { .term-grid { grid-template-columns:1.55fr .95fr } }
-.code { border:1px solid var(--line); background:var(--surface); overflow-x:auto }
-.code-bar { display:flex; align-items:center; gap:.6rem; padding:.7rem 1.1rem; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:.7rem; color:var(--ink-3); letter-spacing:.06em }
-.code pre { padding:1.3rem clamp(1.1rem,2.2vw,1.6rem) 1.6rem; font-family:var(--mono); font-size:clamp(.7rem,.6rem + .3vw,.82rem); line-height:1.85; color:var(--ink-2); white-space:pre; min-width:max-content }
-.code .hi { color:var(--ink); font-weight:500 }
-.code .ac { color:var(--accent); font-weight:500 }
-.code .gd { color:var(--good) }
-.rail dt { font-weight:500; color:var(--ink); font-size:.95rem }
-.rail dd { font-size:.9rem; margin-top:.35rem; color:var(--ink-2) }
-.rail div + div { margin-top:1.6rem; padding-top:1.6rem; border-top:1px solid var(--line) }
+.band{padding-block:var(--sect)}
+.band-grid{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2rem}
+@media (min-width:700px){.band-grid{grid-template-columns:repeat(4,1fr)}}
+.band-cell{background:var(--bg);padding:clamp(1.3rem,2.4vw,1.9rem)}
+.band-cell .v{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(1.5rem,1rem + 1.5vw,2.1rem);color:var(--ink);letter-spacing:-.02em}
+.band-cell .k{font-size:.83rem;color:var(--ink-3);margin-top:.4rem}
+.caption{font-size:.8rem;color:var(--ink-3);margin-top:1rem}
 
-/* ── Evidence bento: 6 cells for 6 measurements ─────────────────────────── */
-.bento { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:2.5rem }
-@media (min-width:660px) { .bento { grid-template-columns:repeat(2,1fr) } }
-@media (min-width:1000px) {
-  .bento { grid-template-columns:repeat(3,1fr) }
-  .cell.lead { grid-column:span 2 }
-}
-.cell { background:var(--bg); padding:clamp(1.4rem,2.6vw,2.1rem); display:flex; flex-direction:column }
-.cell.lead { background:var(--accent-bg) }
-.cell.tint { background:var(--surface) }
-.cell .v { font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:clamp(1.9rem,1.2rem + 2.2vw,3rem); color:var(--ink); line-height:1; letter-spacing:-.03em }
-.cell.lead .v { color:var(--accent) }
-.cell .v small { font-size:.42em; color:var(--ink-3); letter-spacing:0 }
-.cell p { font-size:.92rem; margin-top:.8rem; flex:1 }
-.cell cite { font-family:var(--mono); font-style:normal; font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3); margin-top:1.2rem }
+.term-grid{display:grid;gap:clamp(1.5rem,3vw,2.5rem);align-items:start}
+@media (min-width:940px){.term-grid{grid-template-columns:1.55fr .95fr}}
+.code{border:1px solid var(--line-2);background:var(--surface);overflow-x:auto}
+.code-bar{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.1rem;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:.7rem;color:var(--ink-3);letter-spacing:.06em;background:var(--recess)}
+.code pre{padding:1.3rem clamp(1.1rem,2.2vw,1.6rem) 1.6rem;font-family:var(--mono);
+  font-size:clamp(.7rem,.6rem + .3vw,.82rem);line-height:1.85;color:var(--ink-2);white-space:pre;min-width:max-content}
+.code .hi{color:var(--ink);font-weight:500}
+.code .ac{color:var(--accent);font-weight:500}
+.code .gd{color:var(--good)}
+.rail dt{font-weight:500;color:var(--ink);font-size:.95rem}
+.rail dd{font-size:.9rem;margin-top:.35rem;color:var(--ink-2)}
+.rail div + div{margin-top:1.6rem;padding-top:1.6rem;border-top:1px solid var(--line)}
 
-.note { border-left:2px solid var(--crit); padding:1.1rem 0 1.1rem 1.5rem; margin-top:2.5rem; max-width:60ch }
-.note b { color:var(--ink); font-weight:500 }
-.note .stamp { display:inline-block; margin-top:.9rem; font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--crit); border:1px solid var(--crit); padding:.3rem .6rem }
+.bento{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.5rem}
+@media (min-width:660px){.bento{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1000px){.bento{grid-template-columns:repeat(3,1fr)}.cell.lead{grid-column:span 2}}
+.cell{background:var(--bg);padding:clamp(1.4rem,2.6vw,2.1rem);display:flex;flex-direction:column}
+.cell.lead{background:var(--accent-bg)}
+.cell.tint{background:var(--surface)}
+.cell .v{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(1.9rem,1.2rem + 2.2vw,3rem);color:var(--ink);line-height:1;letter-spacing:-.03em}
+.cell.lead .v{color:var(--accent)}
+.cell .v small{font-size:.42em;color:var(--ink-3);letter-spacing:0}
+.cell p{font-size:.92rem;margin-top:.8rem;flex:1}
+.cell cite{font-family:var(--mono);font-style:normal;font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-3);margin-top:1.2rem}
 
-/* ── Checks ledger: rows, not equal cards ───────────────────────────────── */
-.ledger { margin-top:2.5rem; border-top:1px solid var(--line) }
-.row { display:grid; gap:.6rem 2rem; padding-block:1.8rem; border-bottom:1px solid var(--line); align-items:start }
-@media (min-width:820px) { .row { grid-template-columns:minmax(0,10rem) minmax(0,1fr) auto } }
-.row p { font-size:.95rem; max-width:60ch }
-.chip { font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; padding:.3rem .6rem; border:1px solid currentColor; justify-self:start; white-space:nowrap }
-.chip.on { color:var(--good) }
-.chip.off { color:var(--ink-3) }
+.note{border-left:2px solid var(--crit);padding:1.1rem 0 1.1rem 1.5rem;margin-top:2.5rem;max-width:60ch}
+.note b{color:var(--ink);font-weight:500}
+.note .stamp{display:inline-block;margin-top:.9rem;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--crit);border:1px solid var(--crit);padding:.3rem .6rem}
 
-/* ── Principles: hairline grid, no cards ────────────────────────────────── */
-.prin { display:grid; gap:2.2rem 2.5rem; margin-top:2.5rem }
-@media (min-width:720px) { .prin { grid-template-columns:repeat(2,1fr) } }
-@media (min-width:1040px) { .prin { grid-template-columns:repeat(4,1fr) } }
-.prin div { padding-top:1.1rem; border-top:1px solid var(--line-2) }
-.prin p { font-size:.9rem; margin-top:.5rem }
+.ledger{margin-top:2.5rem;border-top:1px solid var(--line)}
+.row{display:grid;gap:.6rem 2rem;padding-block:1.8rem;border-bottom:1px solid var(--line);align-items:start}
+@media (min-width:820px){.row{grid-template-columns:minmax(0,10rem) minmax(0,1fr) auto}}
+.row p{font-size:.95rem;max-width:60ch}
+.chip{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.3rem .6rem;border:1px solid currentColor;justify-self:start;white-space:nowrap}
+.chip.on{color:var(--good)}
+.chip.off{color:var(--ink-3)}
 
-/* ── Close ──────────────────────────────────────────────────────────────── */
-.close { padding-block:var(--sect); border-top:1px solid var(--line) }
-footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82rem; color:var(--ink-3) }
-.foot-in { display:flex; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; align-items:center }
-.foot-in a { text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; color:var(--ink-2); transition:color .18s }
-.foot-in a:hover { color:var(--accent) }
+.prin{display:grid;gap:2.2rem 2.5rem;margin-top:2.5rem}
+@media (min-width:720px){.prin{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1040px){.prin{grid-template-columns:repeat(4,1fr)}}
+.prin div{padding-top:1.1rem;border-top:1px solid var(--line-2)}
+.prin p{font-size:.9rem;margin-top:.5rem}
+
+.close{padding-block:var(--sect);border-top:1px solid var(--line)}
+footer{border-top:1px solid var(--line);padding-block:2.2rem;font-size:.82rem;color:var(--ink-3)}
+.foot-in{display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;align-items:center}
+.foot-in a{text-decoration:none;display:inline-flex;align-items:center;gap:.45rem;color:var(--ink-2);transition:color .18s}
+.foot-in a:hover{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -223,9 +199,7 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <nav>
   <div class="wrap nav-in">
     <a class="brand" href="#top">cupel</a>
-    <div class="nav-links">
-      <a href="https://github.com/mihhhir08/cupel">GitHub</a>
-    </div>
+    <div class="nav-links"><a href="https://github.com/mihhhir08/cupel">GitHub</a></div>
   </div>
 </nav>
 
@@ -236,28 +210,22 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
       <p class="lede">cupel grades every skill and MCP server on your machine. What it
       costs, what it can reach, whether it works.</p>
       <div class="cta-row">
-        <div class="cmd">
-          <code><b>$</b> npx cupel</code>
-          <button class="copy" id="copy" type="button">Copy</button>
-        </div>
+        <div class="cmd"><code><b>$</b> npx cupel</code><button class="copy" type="button">Copy</button></div>
         <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
       </div>
     </div>
 
-    <div class="gauge">
-      <div class="gauge-head">
-        <span class="eyebrow">Context window</span>
-        <span class="num">200,000</span>
+    <div class="readout">
+      <div class="ro-head">
+        <span class="eyebrow">Your context window</span>
+        <span class="num">200,000 tokens</span>
       </div>
-      <div class="meter">
-        <div class="meter-top"><b>Loaded every turn</b><span class="num">5,758</span></div>
-        <div class="track"><div class="fill lo" style="--w:2.9%"></div></div>
-        <p class="meter-note">2.9% of the window, paid on every request.</p>
-      </div>
-      <div class="meter">
-        <div class="meter-top"><b>If every skill fires</b><span class="num">192,446</span></div>
-        <div class="track"><div class="fill" style="--w:96.2%"></div></div>
-        <p class="meter-note">96.2% of the window, before any of your code.</p>
+      <div class="grid-wrap"><div class="grid" aria-hidden="true"><i class="b on" style="--d:0ms"></i><i class="b on" style="--d:5ms"></i><i class="b on" style="--d:10ms"></i><i class="b on" style="--d:15ms"></i><i class="b on" style="--d:20ms"></i><i class="b on" style="--d:25ms"></i><i class="b use" style="--d:30ms"></i><i class="b use" style="--d:35ms"></i><i class="b use" style="--d:40ms"></i><i class="b use" style="--d:45ms"></i><i class="b use" style="--d:50ms"></i><i class="b use" style="--d:55ms"></i><i class="b use" style="--d:60ms"></i><i class="b use" style="--d:65ms"></i><i class="b use" style="--d:70ms"></i><i class="b use" style="--d:75ms"></i><i class="b use" style="--d:80ms"></i><i class="b use" style="--d:85ms"></i><i class="b use" style="--d:90ms"></i><i class="b use" style="--d:95ms"></i><i class="b use" style="--d:100ms"></i><i class="b use" style="--d:105ms"></i><i class="b use" style="--d:110ms"></i><i class="b use" style="--d:115ms"></i><i class="b use" style="--d:120ms"></i><i class="b use" style="--d:125ms"></i><i class="b use" style="--d:130ms"></i><i class="b use" style="--d:135ms"></i><i class="b use" style="--d:140ms"></i><i class="b use" style="--d:145ms"></i><i class="b use" style="--d:150ms"></i><i class="b use" style="--d:155ms"></i><i class="b use" style="--d:160ms"></i><i class="b use" style="--d:165ms"></i><i class="b use" style="--d:170ms"></i><i class="b use" style="--d:175ms"></i><i class="b use" style="--d:180ms"></i><i class="b use" style="--d:185ms"></i><i class="b use" style="--d:190ms"></i><i class="b use" style="--d:195ms"></i><i class="b use" style="--d:200ms"></i><i class="b use" style="--d:205ms"></i><i class="b use" style="--d:210ms"></i><i class="b use" style="--d:215ms"></i><i class="b use" style="--d:220ms"></i><i class="b use" style="--d:225ms"></i><i class="b use" style="--d:230ms"></i><i class="b use" style="--d:235ms"></i><i class="b use" style="--d:240ms"></i><i class="b use" style="--d:245ms"></i><i class="b use" style="--d:250ms"></i><i class="b use" style="--d:255ms"></i><i class="b use" style="--d:260ms"></i><i class="b use" style="--d:265ms"></i><i class="b use" style="--d:270ms"></i><i class="b use" style="--d:275ms"></i><i class="b use" style="--d:280ms"></i><i class="b use" style="--d:285ms"></i><i class="b use" style="--d:290ms"></i><i class="b use" style="--d:295ms"></i><i class="b use" style="--d:300ms"></i><i class="b use" style="--d:305ms"></i><i class="b use" style="--d:310ms"></i><i class="b use" style="--d:315ms"></i><i class="b use" style="--d:320ms"></i><i class="b use" style="--d:325ms"></i><i class="b use" style="--d:330ms"></i><i class="b use" style="--d:335ms"></i><i class="b use" style="--d:340ms"></i><i class="b use" style="--d:345ms"></i><i class="b use" style="--d:350ms"></i><i class="b use" style="--d:355ms"></i><i class="b use" style="--d:360ms"></i><i class="b use" style="--d:365ms"></i><i class="b use" style="--d:370ms"></i><i class="b use" style="--d:375ms"></i><i class="b use" style="--d:380ms"></i><i class="b use" style="--d:385ms"></i><i class="b use" style="--d:390ms"></i><i class="b use" style="--d:395ms"></i><i class="b use" style="--d:400ms"></i><i class="b use" style="--d:405ms"></i><i class="b use" style="--d:410ms"></i><i class="b use" style="--d:415ms"></i><i class="b use" style="--d:420ms"></i><i class="b use" style="--d:425ms"></i><i class="b use" style="--d:430ms"></i><i class="b use" style="--d:435ms"></i><i class="b use" style="--d:440ms"></i><i class="b use" style="--d:445ms"></i><i class="b use" style="--d:450ms"></i><i class="b use" style="--d:455ms"></i><i class="b use" style="--d:460ms"></i><i class="b use" style="--d:465ms"></i><i class="b use" style="--d:470ms"></i><i class="b use" style="--d:475ms"></i><i class="b use" style="--d:480ms"></i><i class="b use" style="--d:485ms"></i><i class="b use" style="--d:490ms"></i><i class="b use" style="--d:495ms"></i><i class="b use" style="--d:500ms"></i><i class="b use" style="--d:505ms"></i><i class="b use" style="--d:510ms"></i><i class="b use" style="--d:515ms"></i><i class="b use" style="--d:520ms"></i><i class="b use" style="--d:525ms"></i><i class="b use" style="--d:530ms"></i><i class="b use" style="--d:535ms"></i><i class="b use" style="--d:540ms"></i><i class="b use" style="--d:545ms"></i><i class="b use" style="--d:550ms"></i><i class="b use" style="--d:555ms"></i><i class="b use" style="--d:560ms"></i><i class="b use" style="--d:565ms"></i><i class="b use" style="--d:570ms"></i><i class="b use" style="--d:575ms"></i><i class="b use" style="--d:580ms"></i><i class="b use" style="--d:585ms"></i><i class="b use" style="--d:590ms"></i><i class="b use" style="--d:595ms"></i><i class="b use" style="--d:600ms"></i><i class="b use" style="--d:605ms"></i><i class="b use" style="--d:610ms"></i><i class="b use" style="--d:615ms"></i><i class="b use" style="--d:620ms"></i><i class="b use" style="--d:625ms"></i><i class="b use" style="--d:630ms"></i><i class="b use" style="--d:635ms"></i><i class="b use" style="--d:640ms"></i><i class="b use" style="--d:645ms"></i><i class="b use" style="--d:650ms"></i><i class="b use" style="--d:655ms"></i><i class="b use" style="--d:660ms"></i><i class="b use" style="--d:665ms"></i><i class="b use" style="--d:670ms"></i><i class="b use" style="--d:675ms"></i><i class="b use" style="--d:680ms"></i><i class="b use" style="--d:685ms"></i><i class="b use" style="--d:690ms"></i><i class="b use" style="--d:695ms"></i><i class="b use" style="--d:700ms"></i><i class="b use" style="--d:705ms"></i><i class="b use" style="--d:710ms"></i><i class="b use" style="--d:715ms"></i><i class="b use" style="--d:720ms"></i><i class="b use" style="--d:725ms"></i><i class="b use" style="--d:730ms"></i><i class="b use" style="--d:735ms"></i><i class="b use" style="--d:740ms"></i><i class="b use" style="--d:745ms"></i><i class="b use" style="--d:750ms"></i><i class="b use" style="--d:755ms"></i><i class="b use" style="--d:760ms"></i><i class="b use" style="--d:765ms"></i><i class="b use" style="--d:770ms"></i><i class="b use" style="--d:775ms"></i><i class="b use" style="--d:780ms"></i><i class="b use" style="--d:785ms"></i><i class="b use" style="--d:790ms"></i><i class="b use" style="--d:795ms"></i><i class="b use" style="--d:800ms"></i><i class="b use" style="--d:805ms"></i><i class="b use" style="--d:810ms"></i><i class="b use" style="--d:815ms"></i><i class="b use" style="--d:820ms"></i><i class="b use" style="--d:825ms"></i><i class="b use" style="--d:830ms"></i><i class="b use" style="--d:835ms"></i><i class="b use" style="--d:840ms"></i><i class="b use" style="--d:845ms"></i><i class="b use" style="--d:850ms"></i><i class="b use" style="--d:855ms"></i><i class="b use" style="--d:860ms"></i><i class="b use" style="--d:865ms"></i><i class="b use" style="--d:870ms"></i><i class="b use" style="--d:875ms"></i><i class="b use" style="--d:880ms"></i><i class="b use" style="--d:885ms"></i><i class="b use" style="--d:890ms"></i><i class="b use" style="--d:895ms"></i><i class="b use" style="--d:900ms"></i><i class="b use" style="--d:905ms"></i><i class="b use" style="--d:910ms"></i><i class="b use" style="--d:915ms"></i><i class="b use" style="--d:920ms"></i><i class="b use" style="--d:925ms"></i><i class="b use" style="--d:930ms"></i><i class="b use" style="--d:935ms"></i><i class="b use" style="--d:940ms"></i><i class="b use" style="--d:945ms"></i><i class="b use" style="--d:950ms"></i><i class="b use" style="--d:955ms"></i><i class="b use" style="--d:960ms"></i><i class="b free" style="--d:965ms"></i><i class="b free" style="--d:970ms"></i><i class="b free" style="--d:975ms"></i><i class="b free" style="--d:980ms"></i><i class="b free" style="--d:985ms"></i><i class="b free" style="--d:990ms"></i><i class="b free" style="--d:995ms"></i></div></div>
+      <div class="ticks"><span>0</span><span>50K</span><span>100K</span><span>150K</span><span>200K</span></div>
+      <div class="legend">
+        <div class="lg"><i class="sw on"></i> Loaded on every turn <span class="num">5,758</span></div>
+        <div class="lg"><i class="sw use"></i> Loads when a skill fires <span class="num">186,688</span></div>
+        <div class="lg"><i class="sw free"></i> Left for your actual work <span class="num">7,554</span></div>
       </div>
     </div>
   </div>
@@ -266,12 +234,21 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <div class="compat">
   <div class="wrap compat-in">
     <span>Reads configuration from</span>
-    <ul>
-      <li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Anthropic" fill="currentColor"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg></li>
-      <li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Cursor" fill="currentColor"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg></li>
-    </ul>
+    <ul><li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Anthropic" fill="currentColor"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg></li><li><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="Cursor" fill="currentColor"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg></li></ul>
   </div>
 </div>
+
+<section class="shout wrap rev">
+  <div class="shout-in">
+    <div class="big">7<sub>/200</sub></div>
+    <div>
+      <h2>Seven blocks of two hundred are still yours.</h2>
+      <p>Every block above is a thousand tokens. Six are spent before you type
+      anything. One hundred and eighty seven more arrive the moment your skills
+      fire. Nobody chose this. It accumulated.</p>
+    </div>
+  </div>
+</section>
 
 <section class="band wrap rev">
   <h2>One real machine, measured.</h2>
@@ -301,21 +278,12 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
   <span class="hi">Verdict</span>    <span class="gd">A</span></pre>
     </div>
     <dl class="rail">
-      <div>
-        <dt>Token tax</dt>
-        <dd>Names and descriptions stay resident so the agent knows what it can
-        reach for. You pay this on every single request.</dd>
-      </div>
-      <div>
-        <dt>On use</dt>
-        <dd>Skill bodies load only when invoked. This is what arrives if all of
-        them fire in one session.</dd>
-      </div>
-      <div>
-        <dt>Verdict</dt>
-        <dd>Your worst pillar, never the average. A skill that is cheap, elegant
-        and unsafe does not get a B.</dd>
-      </div>
+      <div><dt>Token tax</dt><dd>Names and descriptions stay resident so the agent knows
+        what it can reach for. You pay this on every single request.</dd></div>
+      <div><dt>On use</dt><dd>Skill bodies load only when invoked. This is what arrives
+        if all of them fire in one session.</dd></div>
+      <div><dt>Verdict</dt><dd>Your worst pillar, never the average. A skill that is cheap,
+        elegant and unsafe does not get a B.</dd></div>
     </dl>
   </div>
 </section>
@@ -325,45 +293,29 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
   <h2 style="margin-top:.9rem">Distribution arrived. Every quality gate was skipped.</h2>
   <p style="margin-top:1.1rem">Coding agents went from no extension model to eight marketplaces in
   eighteen months, with no verified publishers, no provenance, and no audit command.</p>
-
   <div class="bento">
-    <div class="cell lead">
-      <div class="v">36%</div>
-      <p>of 3,984 scanned skills carry prompt-injection flaws. Seventy six shipped
-      with live payloads.</p>
-      <cite>Snyk ToxicSkills, Feb 2026</cite>
-    </div>
-    <div class="cell">
-      <div class="v">12%</div>
+    <div class="cell lead"><div class="v">36%</div>
+      <p>of 3,984 scanned skills carry prompt-injection flaws. Seventy six shipped with live payloads.</p>
+      <cite>Snyk ToxicSkills, Feb 2026</cite></div>
+    <div class="cell"><div class="v">12%</div>
       <p>of 2,857 ClawHub skills were outright malicious.</p>
-      <cite>Independent audit, 2026</cite>
-    </div>
-    <div class="cell tint">
-      <div class="v">1,184</div>
+      <cite>Independent audit, 2026</cite></div>
+    <div class="cell tint"><div class="v">1,184</div>
       <p>skills poisoned in the ClawHavoc campaign, delivered through updates.</p>
-      <cite>OWASP, Apr 2026</cite>
-    </div>
-    <div class="cell">
-      <div class="v">6.2<small> / 12</small></div>
-      <p>mean quality across 47,150 public skills. Curated sets lift agent pass
-      rates by 16.2 points.</p>
-      <cite>SkillsBench, 2026</cite>
-    </div>
-    <div class="cell tint">
-      <div class="v">42,000</div>
+      <cite>OWASP, Apr 2026</cite></div>
+    <div class="cell"><div class="v">6.2<small> / 12</small></div>
+      <p>mean quality across 47,150 public skills. Curated sets lift agent pass rates by 16.2 points.</p>
+      <cite>SkillsBench, 2026</cite></div>
+    <div class="cell tint"><div class="v">42,000</div>
       <p>tokens of tool schemas from one MCP server, or 21% of a 200K window.</p>
-      <cite>Measured, 2026</cite>
-    </div>
-    <div class="cell">
-      <div class="v">$2.3B</div>
+      <cite>Measured, 2026</cite></div>
+    <div class="cell"><div class="v">$2.3B</div>
       <p>in direct losses attributed to prompt injection, up 340% year over year.</p>
-      <cite>Recorded Future, 2026</cite>
-    </div>
+      <cite>Recorded Future, 2026</cite></div>
   </div>
-
   <div class="note">
-    <p><b>A verified marketplace was formally requested.</b> Publisher identity,
-    security review, code signing, filed as
+    <p><b>A verified marketplace was formally requested.</b> Publisher identity, security
+    review, code signing, filed as
     <a class="ghost" href="https://github.com/anthropics/claude-code/issues/30727">claude-code issue 30727</a>.</p>
     <span class="stamp">Closed as not planned</span>
     <p style="margin-top:1rem">Nobody is coming. Run the assay yourself.</p>
@@ -373,33 +325,24 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <section class="wrap rev" style="padding-bottom:var(--sect)">
   <h2>Three pillars, one verdict.</h2>
   <div class="ledger">
-    <div class="row">
-      <h3>Cost</h3>
-      <p>Token weight of every tool schema and skill body, split into what you pay
-      per turn and what waits until invocation.</p>
-      <span class="chip on">Shipped</span>
-    </div>
-    <div class="row">
-      <h3>Safety</h3>
-      <p>Injection patterns, hidden Unicode and homoglyphs, credential path reach,
-      network egress, shell surface, provenance.</p>
-      <span class="chip off">In progress</span>
-    </div>
-    <div class="row">
-      <h3>Quality</h3>
-      <p>Structure, trigger clarity, length against usefulness, and semantic
-      overlap with the other skills you already have.</p>
-      <span class="chip off">Planned</span>
-    </div>
+    <div class="row"><h3>Cost</h3>
+      <p>Token weight of every tool schema and skill body, split into what you pay per turn
+      and what waits until invocation.</p><span class="chip on">Shipped</span></div>
+    <div class="row"><h3>Safety</h3>
+      <p>Injection patterns, hidden Unicode and homoglyphs, credential path reach, network
+      egress, shell surface, provenance.</p><span class="chip off">In progress</span></div>
+    <div class="row"><h3>Quality</h3>
+      <p>Structure, trigger clarity, length against usefulness, and semantic overlap with
+      the other skills you already have.</p><span class="chip off">Planned</span></div>
   </div>
 </section>
 
 <section class="wrap rev" style="padding-bottom:var(--sect)">
   <p class="eyebrow">Planned</p>
-  <h2 style="margin-top:.9rem; max-width:18ch">Every scanner is blind to time.</h2>
+  <h2 style="margin-top:.9rem;max-width:18ch">Every scanner is blind to time.</h2>
   <p style="margin-top:1.1rem">ClawHavoc poisoned 1,184 skills through updates. The attack that actually
-  happened is a change over time, and a stateless scanner cannot see it. cupel keeps a
-  lockfile and reports what moved.</p>
+  happened is a change over time, and a stateless scanner cannot see it. cupel keeps a lockfile
+  and reports what moved.</p>
   <div class="code" style="margin-top:2rem">
     <div class="code-bar">cupel diff</div>
 <pre><span class="hi">CHANGED  github-mcp  2.2.0 to 2.3.0</span>
@@ -415,32 +358,17 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <section class="wrap rev" style="padding-bottom:var(--sect)">
   <h2>Non-negotiable.</h2>
   <div class="prin">
-    <div>
-      <h3>No network</h3>
-      <p>Zero calls in the default path, enforced by a test rather than a promise.</p>
-    </div>
-    <div>
-      <h3>No account, no telemetry</h3>
-      <p>Credential values in your config files are never read, stored, or rendered.</p>
-    </div>
-    <div>
-      <h3>Cross-platform</h3>
-      <p>Existing runtime tools are Linux kernel only. This runs on your Mac.</p>
-    </div>
-    <div>
-      <h3>Rules are data</h3>
-      <p>Detection rules are versioned YAML with their own cases. Contribute without TypeScript.</p>
-    </div>
+    <div><h3>No network</h3><p>Zero calls in the default path, enforced by a test rather than a promise.</p></div>
+    <div><h3>No account, no telemetry</h3><p>Credential values in your config files are never read, stored, or rendered.</p></div>
+    <div><h3>Cross-platform</h3><p>Existing runtime tools are Linux kernel only. This runs on your Mac.</p></div>
+    <div><h3>Rules are data</h3><p>Detection rules are versioned YAML with their own cases. Contribute without TypeScript.</p></div>
   </div>
 </section>
 
 <section class="close wrap rev">
   <h2 style="max-width:16ch">Find out what you already installed.</h2>
   <div class="cta-row">
-    <div class="cmd">
-      <code><b>$</b> npx cupel</code>
-      <button class="copy" type="button">Copy</button>
-    </div>
+    <div class="cmd"><code><b>$</b> npx cupel</code><button class="copy" type="button">Copy</button></div>
     <a class="ghost" href="https://github.com/mihhhir08/cupel">View source</a>
   </div>
 </section>
@@ -448,7 +376,7 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <footer class="wrap">
   <div class="foot-in">
     <span>Apache 2.0, built by Mihirsinh Chavda</span>
-    <span style="display:flex; gap:1.5rem">
+    <span style="display:flex;gap:1.5rem">
       <a href="https://github.com/mihhhir08/cupel"><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="GitHub" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg> GitHub</a>
       <a href="https://www.npmjs.com/package/cupel"><svg class="ico" viewBox="0 0 24 24" role="img" aria-label="npm" fill="currentColor"><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"/></svg> npm</a>
     </span>
@@ -458,22 +386,14 @@ footer { border-top:1px solid var(--line); padding-block:2.2rem; font-size:.82re
 <script>
 document.querySelectorAll('.copy').forEach(function (btn) {
   btn.addEventListener('click', async function () {
-    try {
-      await navigator.clipboard.writeText('npx cupel');
-      btn.textContent = 'Copied';
-    } catch {
-      btn.textContent = 'Select it';
-    }
+    try { await navigator.clipboard.writeText('npx cupel'); btn.textContent = 'Copied'; }
+    catch { btn.textContent = 'Select it'; }
     setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
   });
 });
-
-/* Reveal on entry. IntersectionObserver, never a scroll listener. */
 if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-    });
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
   document.querySelectorAll('.rev').forEach(function (el) { io.observe(el); });
 } else {
