@@ -13,10 +13,11 @@ npx cupel
 
 </div>
 
-> **Status: design complete, implementation in progress.**
-> The design, PRD, and scope are finished and in [`docs/`](docs/). The CLI is being
-> built in the open — the output below is the target, not a shipped feature. Star
-> the repo to follow along, or [contribute a rule](docs/) once Phase 3 lands.
+> **Status: `cupel scan` works today. Cost pillar shipped; safety and quality are next.**
+> Discovery and the cost pillar are implemented and tested on macOS, Linux, and
+> Windows. The safety and quality pillars, the lockfile, and `cupel diff` are
+> designed and planned but not yet built — sections describing them below are
+> marked. Star the repo to follow along.
 
 ---
 
@@ -51,40 +52,41 @@ So nobody is coming. Run the assay yourself.
 
 ## What it does
 
+Real output, run against the author's own machine:
+
 ```
 $ npx cupel
 
-  Assaying 22 extensions ...
+  Assayed 83 extensions
 
-  ┌ SAFETY ──────────────────────────────────────────────────┐
-  │  D   notion-mcp        reads ~/.config/gh, egress ×3      │
-  │  C   pdf-wizard        hidden unicode in description      │
-  │  B   sql-runner        shell exec surface                 │
-  └──────────────────────────────────────────────────────────┘
+  A  math-olympiad               180 tok   0% of window  +4,757 on use
+  A  hook-development            136 tok   0% of window  +3,909 on use
+  A  command-development         128 tok   0% of window  +4,628 on use
+  A  build-mcp-app               117 tok   0% of window  +4,616 on use
+  ...
 
-  ┌ COST ────────────────────────────────────────────────────┐
-  │  github-mcp        41,900 tok    21% of window  $0.13/turn│
-  │  playwright-mcp    14,300 tok     7% of window  $0.04/turn│
-  └──────────────────────────────────────────────────────────┘
-
-  Token tax    63,400 tokens per turn — 32% of your window
-  Verdict      D    2 extensions need attention
-
-  cupel explain notion-mcp     cupel lock
+  Token tax  5,758 tokens per turn — 3% of your window
+  On use     192,446 tokens if every extension fires
+  Verdict    A
 ```
+
+Two numbers, because they behave differently. **Token tax** is what every
+extension costs you on *every single turn* — skill names and descriptions stay
+resident so the agent knows what it can reach for. **On use** is what would load
+if all of them actually fired: 192,446 tokens, or 96% of a 200K window.
 
 Three pillars, one verdict. **The verdict is your worst pillar, never the average** —
 a skill that's elegant, cheap, and insecure is not a B+.
 
-| Pillar | What it measures |
-| --- | --- |
-| **Safety** | Injection patterns, hidden Unicode and homoglyphs, credential-path reach, network egress, shell surface, provenance |
-| **Cost** | Token weight of every tool schema and skill body, per-turn tax, share of your context window, projected spend |
-| **Quality** | Structure, trigger clarity, length against usefulness, semantic overlap with your other skills |
+| Pillar | What it measures | Status |
+| --- | --- | --- |
+| **Cost** | Token weight of every tool schema and skill body, per-turn tax vs. deferred, share of your context window | **shipped** |
+| **Safety** | Injection patterns, hidden Unicode and homoglyphs, credential-path reach, network egress, shell surface, provenance | planned |
+| **Quality** | Structure, trigger clarity, length against usefulness, semantic overlap with your other skills | planned |
 
 ---
 
-## The part nobody else does
+## The part nobody else does *(planned)*
 
 Every scanner is **stateless**. It tells you a thing looks fine today.
 
@@ -106,13 +108,14 @@ That's rug-pull detection, running locally, on your machine.
 
 ## Commands
 
-| Command | Purpose |
-| --- | --- |
-| `cupel` | Assay everything discoverable, print the report |
-| `cupel lock` | Write `cupel.lock` |
-| `cupel diff` | Compare current state against the lockfile |
-| `cupel explain <id>` | Full reasoning behind one finding |
-| `cupel gate` | CI mode — exit non-zero on violation |
+| Command | Purpose | Status |
+| --- | --- | --- |
+| `cupel` | Assay everything discoverable, print the report | **works** |
+| `cupel --json` | Machine-readable output | **works** |
+| `cupel lock` | Write `cupel.lock` | planned |
+| `cupel diff` | Compare current state against the lockfile | planned |
+| `cupel explain <id>` | Full reasoning behind one finding | planned |
+| `cupel gate` | CI mode — exit non-zero on violation | planned |
 
 ```yaml
 # .github/workflows/cupel.yml
@@ -156,6 +159,7 @@ have.
 ## Documentation
 
 - [Design](docs/superpowers/specs/2026-08-17-cupel-design.md) — problem analysis, architecture, rationale
+- [Plan: phases 0–2](docs/superpowers/plans/2026-08-17-cupel-phase-0-2.md) — the TDD tasks behind what ships today
 - [PRD](docs/PRD.md) — requirements, users, metrics, risks
 - [Scope](docs/SCOPE.md) — phases, boundaries, definition of done
 
