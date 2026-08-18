@@ -147,6 +147,30 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to write and test a rule.
 | [SCOPE.md](docs/SCOPE.md) | Phases, out-of-scope register, definition of done |
 | [SECURITY.md](SECURITY.md) | Threat model and disclosure |
 
+## Where this lives
+
+The **repository is the permanent address**. Stars, forks, and issues accrue here,
+and the package will point here. The website is a satellite.
+
+It is currently served from two independent hosts, both from `site/`:
+
+| | |
+| --- | --- |
+| [mihhhir08.github.io/cupel](https://mihhhir08.github.io/cupel/) | GitHub Pages, canonical |
+| [cupel-beta.vercel.app](https://cupel-beta.vercel.app/) | Vercel, mirror |
+
+Two hosts is deliberate redundancy: either can go away without the site going
+down. A `rel="canonical"` tag points search engines at one of them so they do
+not compete for the same ranking.
+
+Every internal link in `site/index.html` is relative, so the page runs unchanged
+on any host. If the address ever moves, to a custom domain or anywhere else:
+
+```bash
+node scripts/set-site-url.mjs https://your-domain.dev
+gh repo edit --homepage "https://your-domain.dev/"
+```
+
 ## License
 
 [Apache-2.0](LICENSE)
