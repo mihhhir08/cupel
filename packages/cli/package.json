@@ -1,8 +1,48 @@
 {
   "name": "cupel",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "Grade every skill, plugin, and MCP server your coding agent loads. Local, no network, no account.",
   "type": "module",
-  "bin": { "cupel": "./dist/index.js" },
-  "files": ["dist"],
-  "dependencies": { "@cupel/core": "0.0.1" }
+  "bin": {
+    "cupel": "./dist/cupel.mjs"
+  },
+  "files": [
+    "dist/cupel.mjs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0",
+  "author": "Mihirsinh Chavda",
+  "homepage": "https://mihhhir08.github.io/cupel/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mihhhir08/cupel.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/mihhhir08/cupel/issues"
+  },
+  "keywords": [
+    "mcp",
+    "claude-code",
+    "ai-agents",
+    "agent-security",
+    "prompt-injection",
+    "supply-chain-security",
+    "context-window",
+    "tokens",
+    "cli",
+    "audit"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@cupel/core": "0.0.1"
+  },
+  "dependencies": {
+    "yaml": "^2.5.0"
+  }
 }

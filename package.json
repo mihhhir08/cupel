@@ -11,11 +11,14 @@
   "scripts": {
     "build": "tsc --build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "bundle": "esbuild packages/cli/dist/bin.js --bundle --platform=node --format=esm --target=node20 --external:yaml --outfile=packages/cli/dist/cupel.mjs",
+    "prepublishOnly": "npm run build && npm run bundle"
   },
   "devDependencies": {
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.28.2",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
-    "@types/node": "^20.14.0"
+    "vitest": "^2.1.0"
   }
 }

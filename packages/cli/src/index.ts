@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { assay } from '@cupel/core';
 import { render } from './render.js';
@@ -45,11 +44,3 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
   return 0;
 }
 
-// Run only when invoked directly, so the module stays importable in tests.
-if (process.argv[1]?.endsWith('index.js')) {
-  // Set exitCode rather than calling process.exit: exit() tears down the
-  // process before an async stdout pipe has flushed, truncating --json output.
-  main().then((code) => {
-    process.exitCode = code;
-  });
-}
