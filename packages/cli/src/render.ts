@@ -28,7 +28,8 @@ export function render(assay: Assay, options: RenderOptions = {}): string {
     const share = ((e.tokens / assay.contextWindow) * 100).toFixed(0);
     const name = e.extension.name.padEnd(22);
     const tokens = `${e.tokens.toLocaleString()} tok`.padStart(13);
-    lines.push(`  ${e.verdict}  ${name}${tokens}   ${share}% of window`);
+    const deferred = e.deferredTokens > 0 ? `  +${e.deferredTokens.toLocaleString()} on use` : '';
+    lines.push(`  ${e.verdict}  ${name}${tokens}   ${share}% of window` + c(DIM, deferred));
   }
 
   const taxShare = ((assay.tokenTaxPerTurn / assay.contextWindow) * 100).toFixed(0);
@@ -36,6 +37,9 @@ export function render(assay: Assay, options: RenderOptions = {}): string {
   lines.push(
     c(BOLD, `  Token tax  ${assay.tokenTaxPerTurn.toLocaleString()} tokens per turn`) +
       c(DIM, ` — ${taxShare}% of your window`),
+  );
+  lines.push(
+    c(DIM, `  On use     ${assay.deferredTotal.toLocaleString()} tokens if every extension fires`),
   );
   lines.push(c(BOLD, `  Verdict    ${assay.verdict}`));
   lines.push('');

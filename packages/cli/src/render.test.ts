@@ -10,6 +10,7 @@ const base: Assay = {
   generatedAt: '2026-08-17T00:00:00.000Z',
   contextWindow: 200_000,
   tokenTaxPerTurn: 63_400,
+  deferredTotal: 12_000,
   verdict: 'D',
   coverage: [{ path: '/home/u/.claude/skills', status: 'scanned', found: 2 }],
   extensions: [
@@ -28,6 +29,7 @@ const base: Assay = {
       findings: [],
       verdict: 'F',
       tokens: 41_900,
+      deferredTokens: 0,
     },
   ],
 };
@@ -46,7 +48,7 @@ describe('render', () => {
   });
 
   it('tells the user when nothing was found rather than printing an empty report', () => {
-    const empty: Assay = { ...base, extensions: [], tokenTaxPerTurn: 0, verdict: 'unknown' };
+    const empty: Assay = { ...base, extensions: [], tokenTaxPerTurn: 0, deferredTotal: 0, verdict: 'unknown' };
     expect(render(empty)).toContain('No extensions found');
   });
 

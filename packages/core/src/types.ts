@@ -58,8 +58,10 @@ export interface ExtensionAssay {
   findings: Finding[];
   /** The worst pillar, never the average. */
   verdict: Grade;
-  /** Tokens this extension adds to every turn. */
+  /** Tokens this extension adds to EVERY turn (descriptions, tool schemas). */
   tokens: number;
+  /** Tokens loaded only when the extension is actually invoked (skill bodies). */
+  deferredTokens: number;
 }
 
 export interface CoverageReport {
@@ -75,6 +77,8 @@ export interface Assay {
   contextWindow: number;
   extensions: ExtensionAssay[];
   tokenTaxPerTurn: number;
+  /** Total that would load if every extension were invoked. */
+  deferredTotal: number;
   verdict: Grade;
   coverage: CoverageReport[];
 }

@@ -28,10 +28,12 @@ export async function assay(options: AssayOptions = {}): Promise<Assay> {
       findings: cost.findings,
       verdict: worstGrade(pillars.map((p) => p.grade)),
       tokens: cost.tokens,
+      deferredTokens: cost.deferredTokens,
     };
   });
 
   const tokenTaxPerTurn = extensions.reduce((n, e) => n + e.tokens, 0);
+  const deferredTotal = extensions.reduce((n, e) => n + e.deferredTokens, 0);
   const verdict: Grade = worstGrade(extensions.map((e) => e.verdict));
 
   return {
@@ -40,6 +42,7 @@ export async function assay(options: AssayOptions = {}): Promise<Assay> {
     contextWindow,
     extensions,
     tokenTaxPerTurn,
+    deferredTotal,
     verdict,
     coverage,
   };

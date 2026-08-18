@@ -27,10 +27,19 @@ const server: ExtractedMcpServer = {
 };
 
 describe('analyzeCost', () => {
-  it('counts skill body and description tokens', () => {
+  it('charges only name and description every turn, never the body', () => {
     const r = analyzeCost(skill);
-    expect(r.tokens).toBeGreaterThan(900);
-    expect(r.tokens).toBeLessThan(1200);
+    // 'pdf-wizard: Extracts tables from PDF files' is well under 100 tokens.
+    expect(r.tokens).toBeLessThan(100);
+    // The 4,000-character body is deferred until the skill is invoked.
+    expect(r.deferredTokens).toBeGreaterThan(900);
+    expect(r.deferredTokens).toBeLessThan(1200);
+  });
+
+  it('charges mcp tool schemas every turn with nothing deferred', () => {
+    const r = analyzeCost(server);
+    expect(r.tokens).toBeGreaterThan(0);
+    expect(r.deferredTokens).toBe(0);
   });
 
   it('counts every mcp tool schema', () => {
@@ -44,12 +53,26 @@ describe('analyzeCost', () => {
     expect(r.tokens).toBe(0);
   });
 
-  it('raises a finding when one extension exceeds the heavy threshold', () => {
-    const heavy: ExtractedSkill = { ...skill, body: 'x'.repeat(200_000) };
-    const r = analyzeCost(heavy);
-    const finding = r.findings.find((f) => f.ruleId === 'cost/heavy-extension');
+  it('raises a finding when an mcp server is heavy every turn', () => {
+    const bloated = {
+      ...server,
+      tools: Array.from({ length: 60 }, (_, i) => ({
+        name: `tool_${i}`,
+        description: 'A tool with a reasonably long description string.'.repeat(12),
+        inputSchema: { type: 'object', properties: { a: { type: 'string' } } },
+      })),
+    };
+    const finding = analyzeCost(bloated).findings.find(
+      (f) => f.ruleId === 'cost/heavy-extension',
+    );
     expect(finding).toBeDefined();
     expect(finding?.severity).toBe('high');
+  });
+
+  it('raises a finding when a skill body is huge on invocation', () => {
+    const heavy: ExtractedSkill = { ...skill, body: 'x'.repeat(200_000) };
+    const finding = analyzeCost(heavy).findings.find((f) => f.ruleId === 'cost/heavy-body');
+    expect(finding).toBeDefined();
   });
 
   it('always attributes findings to the extension id', () => {

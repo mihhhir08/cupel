@@ -11,20 +11,23 @@ export interface DiscoverResult {
 }
 
 async function findSkillFiles(dir: string): Promise<string[]> {
-  const out: string[] = [];
   let entries;
   try {
     entries = await readdir(dir, { withFileTypes: true });
   } catch {
-    return out;
+    return [];
   }
+
+  // A directory holding a SKILL.md *is* the skill. Anything nested below it is
+  // vendored content (an `upstream/` copy, bundled examples), not a separate
+  // installed skill, so we stop descending here.
+  if (entries.some((e) => e.isFile() && e.name === 'SKILL.md')) {
+    return [join(dir, 'SKILL.md')];
+  }
+
+  const out: string[] = [];
   for (const entry of entries) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      out.push(...(await findSkillFiles(full)));
-    } else if (entry.name === 'SKILL.md') {
-      out.push(full);
-    }
+    if (entry.isDirectory()) out.push(...(await findSkillFiles(join(dir, entry.name))));
   }
   return out;
 }
@@ -64,5 +67,18 @@ export async function discover(ctx: PathContext): Promise<DiscoverResult> {
     coverage.push({ path: file, status: 'scanned', found: servers.length });
   }
 
-  return { extensions, coverage };
+  return { extensions: dedupe(extensions), coverage };
+}
+
+/**
+ * The same skill ships in several places at once — a marketplace clone and a
+ * versioned cache both hold `vercel/skills/workflow`. Only one is ever loaded,
+ * so counting both would inflate the token tax. First path wins.
+ */
+function dedupe(extensions: Extracted[]): Extracted[] {
+  const seen = new Map<string, Extracted>();
+  for (const ext of extensions) {
+    if (!seen.has(ext.id)) seen.set(ext.id, ext);
+  }
+  return [...seen.values()];
 }

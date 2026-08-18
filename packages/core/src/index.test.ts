@@ -21,6 +21,19 @@ describe('assay', () => {
     expect(result.tokenTaxPerTurn).toBe(sum);
   });
 
+  it('tracks deferred tokens separately from the per-turn tax', async () => {
+    const result = await assay({ home: HOME, cwd: PROJ });
+    const sum = result.extensions.reduce((n, e) => n + e.deferredTokens, 0);
+    expect(result.deferredTotal).toBe(sum);
+    expect(result.deferredTotal).toBeGreaterThan(0);
+  });
+
+  it('never reports the same extension twice', async () => {
+    const result = await assay({ home: HOME, cwd: PROJ });
+    const ids = result.extensions.map((e) => e.extension.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it('gives every extension a verdict', async () => {
     const result = await assay({ home: HOME, cwd: PROJ });
     for (const e of result.extensions) {
