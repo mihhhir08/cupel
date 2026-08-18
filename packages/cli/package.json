@@ -4,7 +4,7 @@
   "description": "Grade every skill, plugin, and MCP server your coding agent loads. Local, no network, no account.",
   "type": "module",
   "bin": {
-    "cupel": "./dist/cupel.mjs"
+    "cupel": "dist/cupel.mjs"
   },
   "files": [
     "dist/cupel.mjs",
